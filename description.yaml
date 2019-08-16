@@ -1,0 +1,34 @@
+---
+id: "random_forest_v0_1"
+releaseDate: "July 30, 2019"
+cavLabels:
+  - 'multiple'
+  - '1'
+  - '2'
+  - '3'
+  - '4'
+  - '5'
+  - '6'
+  - '7'
+  - '8'
+faultLabels:
+  - 'E_Quench'
+  - 'Microphonics'
+  - 'Quench'
+  - 'Single Cav Turn off'
+  - 'Multi Cav Turn off'
+brief: "Uses random forests ensemble method for analysis"
+# This is YAML's block scaler with block-chomping set to keep final newlines, and an indent indicator (|+2) or
+# 2.  This means to keep the newline formatting, keep initial indents after the first two spaces, and keep
+# the final newlines.  This string gets present exactly as is in model listings.
+details: |+2
+
+      This model uses random forest models to identify the faulted cavity and fault type of a C100 event.
+
+      This model is based on work done by Chris Tennant, Tom Powers, etc. and represents the initial model used to
+      identify which cavity and fault type is associated with a C100 fault event.  Any individual cavity can be
+      identified as the offending cavity.  Any collection of multiple cavities faulting at the same time are given the
+      generic label of 'multiple'.  The following fault types may be identified by the model: E_Quench, Microphonics,
+      Quench, 'Single Cav Turn off, and Multi-cav Turn Off.
+
+      Additional documentation is available in the package docs folder.
