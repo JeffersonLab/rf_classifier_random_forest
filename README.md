@@ -8,9 +8,12 @@ This software was developed against Python 3.6.9 to match the version of CEBAF's
 Make sure rf_classifier has been installed.  See the Admin Guide at https://jeffersonlab.github.io/rf_classifier for more details.
 
 #### Download this model
+Clone the repository and checkout the desired version.
 ```tcsh
 cd /path/to/rf_classifier/models
 git clone https://github.com/JeffersonLab/rf_classifier_random_forest  random_forest_\<version\>
+cd random_forest_\<version\>
+git checkout \<version\>
 ```
 
 #### Create a python virtual envrironment and install package dependencies
