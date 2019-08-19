@@ -1,7 +1,7 @@
 ---
 id: "random_forest_v0_1"
 releaseDate: "July 30, 2019"
-cavLabels:
+cavityLabels:
   - 'multiple'
   - '1'
   - '2'
@@ -17,6 +17,7 @@ faultLabels:
   - 'Quench'
   - 'Single Cav Turn off'
   - 'Multi Cav Turn off'
+trainingData: "(Spring 2018) 2018_04_24 - 2018_05_06"
 brief: "Uses random forests ensemble method for analysis"
 # This is YAML's block scaler with block-chomping set to keep final newlines, and an indent indicator (|+2) or
 # 2.  This means to keep the newline formatting, keep initial indents after the first two spaces, and keep
