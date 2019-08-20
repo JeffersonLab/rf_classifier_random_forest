@@ -24,4 +24,15 @@ pip3 install -r requirements.txt
 ```
 
 #### Testing
-This model project includes a test script (test_model.py) and data (test-data) that can be used to validate proper functioning of the model after installation.  See the rf_classifier Admin Guide at https://jeffersonlab.github.io/rf_classifier for official documentation.  The short hand version is that you should run rf_classifier/tests/tester.bash to run all tests associated with all models.
+
+This model project includes a test script (test_model.py) and data (test-data) that can be used to validate proper 
+functioning of the model after installation.  See the rf_classifier Admin Guide at 
+https://jeffersonlab.github.io/rf_classifier for official documentation.  The short hand version is that you should run 
+rf_classifier/tests/tester.bash to run all tests associated with all models.  You can directly run tests for this model 
+by running
+
+```bash
+python3 -m  test\test_model.py
+```
+
+
