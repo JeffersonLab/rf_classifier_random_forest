@@ -12,4 +12,7 @@ if [[ "$?" != "0" ]] ; then
 fi
 
 # Run the app passing along all of the args
-python3 ${APP_DIR}/lib/main.py "$@"
+python3 ${APP_DIR}/lib/model.py "$@"
+
+# Unload the python environment
+deactivate
