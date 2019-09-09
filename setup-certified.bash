@@ -2,6 +2,11 @@
 
 SCRIPT_NAME=$(basename $0)
 
+if [ ! -f './setup-certified.bash' ] ; then
+    echo "This script must be run from it's local directory"
+    exit 1
+fi
+
 usage () {
     echo "
 Usage:
@@ -37,18 +42,22 @@ test () {
 
 # This is weird to my sensibilities, but we install by removing unecessary components the git repo
 install () {
-    echo "installing - removing the .git directory"
-#    rm -rf .git
+    echo "installing - removing the .git directory and other files"
+    if [ -d .git ] ; then
+        rm -rf .git
+    fi
+    rm requirements.txt
 }
 
 compact () {
-    echo "compacting - removing the .git directory and venv"
-#    if [ -d .git ] ; then
-#        rm -rf .git
-#    fi
-#    if [ -d ./venv ] ; then
-#        rm -rf ./venv
-#    fi
+    echo "compacting - removing the .git and venv directories along with other files"
+    if [ -d .git ] ; then
+        rm -rf .git
+    fi
+    if [ -d ./venv ] ; then
+        rm -rf ./venv
+    fi
+    rm requirements.txt
 }
 
 
