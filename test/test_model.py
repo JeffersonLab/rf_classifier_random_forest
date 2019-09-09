@@ -232,21 +232,21 @@ exp = {
     ]
 }
 
-exp = {
-    '0L04': [
-        {
-            'path': os.path.join(os.path.dirname(__file__), 'test-data', '0L04', '2018_04_26', '070734.9'),
-            'result': {
-                'cavity-label': '2',
-                'fault-label': 'Microphonics',
-                'cavity-confidence': 0.92,
-                'fault-confidence': 0.856,
-                'location': '0L04',
-                'timestamp': '2018-04-26 07:07:34.9'
-            }
-        }
-    ]
-}
+#exp = {
+#    '0L04': [
+#        {
+#            'path': os.path.join(os.path.dirname(__file__), 'test-data', '0L04', '2018_04_26', '070734.9'),
+#            'result': {
+#                'cavity-label': '2',
+#                'fault-label': 'Microphonics',
+#                'cavity-confidence': 0.92,
+#                'fault-confidence': 0.856,
+#                'location': '0L04',
+#                'timestamp': '2018-04-26 07:07:34.9'
+#            }
+#        }
+#    ]
+#}
 
 class TestRandomForest(TestCase):
 
