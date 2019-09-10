@@ -8,7 +8,7 @@ This software was developed against Python 3.6.9 to match the version of CEBAF's
 Make sure rf_classifier has been installed.  See the Admin Guide at https://jeffersonlab.github.io/rf_classifier for more details.
 
 ### Download this model
-Clone the repository and checkout the desired version.  You can install this directly to rf_classified's model directory OR to a secondary location and link it back into rf_classifier's model's directory.
+Clone the repository and checkout the desired version.  You can install this directly to rf_classified's model directory OR to a secondary location and link it back into rf_classifier's model's directory.  This example shows placing it directly in rf_classifier's models directory.
 
 ```tcsh
 cd /path/to/rf_classifier/models
@@ -18,7 +18,7 @@ git checkout \<version\>
 ```
 
 ### CEBAF Certified Installation
-This section describes a specific installation procedure used by the SQAM.  The General Installation section below provides generic instructions for installing elsewhere.
+This section describes a specific installation procedure used by the SQAM.  The General Installation section below provides generic instructions for installing elsewhere.  This guide assumes you followed the download instructions above and placed the model in /tmp/random_forest.
 
 #### Build Step
 From the temporary location, run "build" target to generate the virtual environment and download any dependencies.
@@ -71,7 +71,7 @@ tar -czf random_forest_<version>.tar.gz random_forest_<version>
 ```
 
 ### General Installation
-
+This section assumes that you have downloaded the model directly into rf_classifier's models directory.
 
 #### Create a python virtual envrironment and install package dependencies
 ```tcsh
@@ -91,6 +91,3 @@ by running
 ```bash
 python3 -m  test\test_model.py
 ```
-
-
-
