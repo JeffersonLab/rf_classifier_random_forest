@@ -3,11 +3,10 @@ An rf_classifier pluggable model for analyzing CEBAF C100 RF fault waveform data
 
 This software was developed against Python 3.6.9 to match the version of CEBAF's and rf_classifier's Python interpreter.
 
+**Note:** Make sure rf_classifier has been installed prior to installing this model.  See the Admin Guide at https://jeffersonlab.github.io/rf_classifier for more details.  
+
 ## Documentation, Release Notes, etc.
 https://jeffersonlab.github.io/rf_classifier_random_forest
-
-## rf_classifier Dependency
-Make sure rf_classifier has been installed prior to installing this model.  See the Admin Guide at https://jeffersonlab.github.io/rf_classifier for more details.  
 
 ## CEBAF Certified Installation
 This section describes a specific installation procedure used by the SQAM.  The General Installation section below provides generic instructions for installing elsewhere.  This guide assumes you followed the download instructions above and placed the model in /tmp/random_forest.
