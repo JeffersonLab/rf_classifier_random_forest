@@ -12,9 +12,9 @@ Clone the repository and checkout the desired version.  You can install this dir
 
 ```tcsh
 cd /path/to/rf_classifier/models
-git clone https://github.com/JeffersonLab/rf_classifier_random_forest  random_forest_\<version\>
-cd random_forest_\<version\>
-git checkout \<version\>
+git clone https://github.com/JeffersonLab/rf_classifier_random_forest  random_forest_<version>
+cd random_forest_<version>
+git checkout <version>
 ```
 
 ### CEBAF Certified Installation
