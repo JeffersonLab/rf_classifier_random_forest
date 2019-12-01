@@ -118,6 +118,7 @@ class Model(BaseModel):
                              str(len(fault_columns)) + ") received " + ascii(fault_df.shape))
 
         # These are the top 50 features found from analyzing sklearn models - no way to generate this in a loop.
+
         top_features = [
             'GLDE__friedrich_coefficients__m_3__r_30__coeff_0',
             'PMES__max_langevin_fixed_point__m_3__r_30',
@@ -217,10 +218,14 @@ class Model(BaseModel):
         # These were selected since this is what SRF experts use to "manually" determine which cavity faulted.
         cavity_label_waveforms = [
             "Time", "id",
-            "1_GMES", "1_GASK", "1_CRFP", "1_DETA2", "2_GMES", "2_GASK", "2_CRFP", "2_DETA2",
-            "3_GMES", "3_GASK", "3_CRFP", "3_DETA2", "4_GMES", "4_GASK", "4_CRFP", "4_DETA2",
-            "5_GMES", "5_GASK", "5_CRFP", "5_DETA2", "6_GMES", "6_GASK", "6_CRFP", "6_DETA2",
-            "7_GMES", "7_GASK", "7_CRFP", "7_DETA2", "8_GMES", "8_GASK", "8_CRFP", "8_DETA2"
+            "1_GMES", "1_GASK", "1_CRFP", "1_DETA2",
+            "2_GMES", "2_GASK", "2_CRFP", "2_DETA2",
+            "3_GMES", "3_GASK", "3_CRFP", "3_DETA2",
+            "4_GMES", "4_GASK", "4_CRFP", "4_DETA2",
+            "5_GMES", "5_GASK", "5_CRFP", "5_DETA2",
+            "6_GMES", "6_GASK", "6_CRFP", "6_DETA2",
+            "7_GMES", "7_GASK", "7_CRFP", "7_DETA2",
+            "8_GMES", "8_GASK", "8_CRFP", "8_DETA2"
         ]
 
         # Subset the event dataframe to contain only the needed waveforms.
@@ -236,6 +241,7 @@ class Model(BaseModel):
         for attr in ('real', 'imag', 'abs', 'angle'):
             for coeff in range(0, 100):  # produces [0, 1, ..., 99]
                 fft_only['fft_coefficient'].append({'attr': attr, 'coeff': coeff})
+
         # Extract the features needed to identify which cavity faulted
         cavity_features = tsfresh.extract_features(cavity_df.astype('float64'),
                                                    disable_progressbar=True,
@@ -245,9 +251,15 @@ class Model(BaseModel):
                                                    default_fc_parameters=fft_only
                                                    )
 
+        # The training data was standardized (i.e., transformed to a t-score based on data in training set).  Here
+        # we load those mean and variance values and standardized this data in the same way
+        cavity_mean = np.load(os.path.join(lib_dir, "model_files", "RF_CAVITY_fft_only_data_mean.npy"))
+        cavity_var = np.load(os.path.join(lib_dir, "model_files", "RF_CAVITY_fft_only_data_var.npy"))
+        cavity_features = (cavity_features - cavity_mean) / cavity_var
+
         # Load the model from disk and make a prediction about which cavity faulted first.  The predict() method returns
         # an array of results.  We only have one result, so pull it out of the array structure now
-        rf_cav_model = joblib.load(os.path.join(lib_dir, 'RandomForest_cavity.pkl'))
+        rf_cav_model = joblib.load(os.path.join(lib_dir, 'model_files', 'RF_CAVITY_fft_only_data.sav'))
         cavity_id = rf_cav_model.predict(cavity_features)
         cavity_id = cavity_id[0]
 
