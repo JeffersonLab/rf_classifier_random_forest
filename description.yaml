@@ -1,6 +1,6 @@
 ---
-id: "random_forest_v1_0"
-releaseDate: "October 15, 2019"
+id: "random_forest_v1_1"
+releaseDate: "December 2, 2019"
 cavityLabels:
   - 'multiple'
   - '1'
@@ -32,4 +32,5 @@ details: |+2
       generic label of 'multiple'.  The following fault types may be identified by the model: E_Quench, Microphonics,
       Quench, 'Single Cav Turn off, and Multi-cav Turn Off.
 
-      Additional documentation is available in the package docs folder.
+      This version used a slightly different training process that included standardizing the tsfresh-extracted
+      features.  Additional documentation is available in the package docs folder.
