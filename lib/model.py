@@ -12,7 +12,6 @@ from tsfresh.feature_extraction import settings
 from sklearn.externals import joblib
 from base_model import BaseModel
 
-
 app_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 """The base directory of this model application."""
 
@@ -118,58 +117,57 @@ class Model(BaseModel):
                              str(len(fault_columns)) + ") received " + ascii(fault_df.shape))
 
         # These are the top 50 features found from analyzing sklearn models - no way to generate this in a loop.
-
         top_features = [
             'GLDE__friedrich_coefficients__m_3__r_30__coeff_0',
-            'PMES__max_langevin_fixed_point__m_3__r_30',
-            'QMES__max_langevin_fixed_point__m_3__r_30',
-            'GMES__fft_coefficient__coeff_16__attr_"real"',
-            'DFQES__friedrich_coefficients__m_3__r_30__coeff_1',
-            'GASK__max_langevin_fixed_point__m_3__r_30',
             'GASK__friedrich_coefficients__m_3__r_30__coeff_0',
-            'GLDE__friedrich_coefficients__m_3__r_30__coeff_1',
-            'GLDE__friedrich_coefficients__m_3__r_30__coeff_2',
-            'PLDE__max_langevin_fixed_point__m_3__r_30',
-            'GMES__friedrich_coefficients__m_3__r_30__coeff_0',
-            'GMES__friedrich_coefficients__m_3__r_30__coeff_1',
-            'PMES__friedrich_coefficients__m_3__r_30__coeff_0',
-            'PMES__friedrich_coefficients__m_3__r_30__coeff_2',
-            'GMES__fft_coefficient__coeff_49__attr_"angle"',
-            'PMES__friedrich_coefficients__m_3__r_30__coeff_3',
-            'GMES__fft_coefficient__coeff_49__attr_"real"',
-            'PLDE__friedrich_coefficients__m_3__r_30__coeff_1',
-            'PLDE__fft_coefficient__coeff_16__attr_"real"',
-            'PLDE__friedrich_coefficients__m_3__r_30__coeff_0',
-            'CRRP__fft_coefficient__coeff_75__attr_"angle"',
-            'GMES__fft_coefficient__coeff_15__attr_"angle"',
-            'QMES__agg_linear_trend__f_agg_"max"__chunk_len_50__attr_"intercept"',
-            'DFQES__max_langevin_fixed_point__m_3__r_30',
-            'GASK__fft_coefficient__coeff_24__attr_"abs"',
-            'CRRP__max_langevin_fixed_point__m_3__r_30',
-            'GMES__fft_coefficient__coeff_11__attr_"angle"',
-            'PLDE__fft_coefficient__coeff_15__attr_"imag"',
-            'GLDE__friedrich_coefficients__m_3__r_30__coeff_3',
-            'CRRP__fft_coefficient__coeff_59__attr_"real"',
-            'GMES__fft_coefficient__coeff_15__attr_"imag"',
-            'GMES__fft_coefficient__coeff_44__attr_"angle"',
-            'GASK__friedrich_coefficients__m_3__r_30__coeff_3',
-            'IASK__fft_coefficient__coeff_29__attr_"abs"',
-            'PLDE__fft_coefficient__coeff_32__attr_"real"',
-            'PMES__friedrich_coefficients__m_3__r_30__coeff_1',
-            'GMES__fft_coefficient__coeff_63__attr_"imag"',
-            'PLDE__friedrich_coefficients__m_3__r_30__coeff_2',
-            'QMES__cwt_coefficients__widths_(2, 5, 10, 20)__coeff_3__w_2',
-            'PLDE__fft_coefficient__coeff_30__attr_"imag"',
-            'QMES__agg_linear_trend__f_agg_"min"__chunk_len_10__attr_"intercept"',
-            'DFQES__friedrich_coefficients__m_3__r_30__coeff_0',
-            'DFQES__friedrich_coefficients__m_3__r_30__coeff_3',
-            'QMES__friedrich_coefficients__m_3__r_30__coeff_1',
+            'PMES__max_langevin_fixed_point__m_3__r_30',
             'GASK__friedrich_coefficients__m_3__r_30__coeff_2',
-            'GMES__fft_coefficient__coeff_96__attr_"imag"',
-            'GMES__fft_coefficient__coeff_30__attr_"imag"',
-            'PLDE__fft_coefficient__coeff_80__attr_"abs"',
-            'GMES__fft_coefficient__coeff_5__attr_"angle"',
-            'PMES__energy_ratio_by_chunks__num_segments_10__segment_focus_4'
+            'GMES__fft_coefficient__coeff_11__attr_"angle"',
+            'DFQES__friedrich_coefficients__m_3__r_30__coeff_3',
+            'GASK__friedrich_coefficients__m_3__r_30__coeff_1',
+            'GASK__friedrich_coefficients__m_3__r_30__coeff_3',
+            'DFQES__friedrich_coefficients__m_3__r_30__coeff_1',
+            'PLDE__max_langevin_fixed_point__m_3__r_30',
+            'GASK__fft_coefficient__coeff_16__attr_"abs"',
+            'GASK__spkt_welch_density__coeff_2',
+            'QASK__fft_coefficient__coeff_48__attr_"imag"',
+            'GMES__fft_aggregated__aggtype_"skew"',
+            'GASK__change_quantiles__f_agg_"mean"__isabs_False__qh_1.0__ql_0.8',
+            'CRFP__spkt_welch_density__coeff_2',
+            'GLDE__quantile__q_0.3',
+            'GMES__fft_aggregated__aggtype_"centroid"',
+            'GLDE__friedrich_coefficients__m_3__r_30__coeff_2',
+            'PLDE__minimum',
+            'GASK__fft_coefficient__coeff_48__attr_"abs"',
+            'DETA2__number_crossing_m__m_1',
+            'CRFP__percentage_of_reoccurring_datapoints_to_all_datapoints',
+            'DFQES__max_langevin_fixed_point__m_3__r_30',
+            'QMES__fft_coefficient__coeff_64__attr_"abs"',
+            'GMES__friedrich_coefficients__m_3__r_30__coeff_0',
+            'GASK__fft_coefficient__coeff_80__attr_"abs"',
+            'CRRP__percentage_of_reoccurring_values_to_all_values',
+            'GASK__max_langevin_fixed_point__m_3__r_30',
+            'IMES__fft_coefficient__coeff_61__attr_"imag"',
+            'IASK__variance',
+            'IMES__agg_linear_trend__f_agg_"var"__chunk_len_10__attr_"intercept"',
+            'PMES__friedrich_coefficients__m_3__r_30__coeff_3',
+            'PMES__fft_coefficient__coeff_31__attr_"angle"',
+            'PMES__friedrich_coefficients__m_3__r_30__coeff_0',
+            'IASK__fft_coefficient__coeff_6__attr_"angle"',
+            'GASK__agg_linear_trend__f_agg_"min"__chunk_len_50__attr_"stderr"',
+            'IMES__mean_second_derivative_central',
+            'PMES__cwt_coefficients__widths_(2, 5, 10, 20)__coeff_6__w_20',
+            'IASK__fft_coefficient__coeff_2__attr_"real"',
+            'QASK__cwt_coefficients__widths_(2, 5, 10, 20)__coeff_14__w_20',
+            'QASK__c3__lag_3',
+            'PMES__friedrich_coefficients__m_3__r_30__coeff_1',
+            'PLDE__autocorrelation__lag_6',
+            'IMES__change_quantiles__f_agg_"mean"__isabs_False__qh_0.8__ql_0.0',
+            'IASK__fft_coefficient__coeff_4__attr_"imag"',
+            'PASK__number_peaks__n_5',
+            'GMES__fft_coefficient__coeff_94__attr_"angle"',
+            'GLDE__energy_ratio_by_chunks__num_segments_10__segment_focus_1',
+            'GASK__sum_of_reoccurring_values'
         ]
 
         # Setup the extraction settings that identifies which columns are to be extracted
@@ -188,9 +186,15 @@ class Model(BaseModel):
                                                   show_warnings=False)
         logging.getLogger('tsfresh').setLevel(old_level)
 
+        # The tsfresh features were standardized based on the training data set.  Load those mean and variances, and
+        # standardized this data as that is what the model is expecting
+        fault_mean = np.load(os.path.join(lib_dir, "model_files", "RF_FAULT_top50_mean.npy"))
+        fault_var = np.load(os.path.join(lib_dir, "model_files", "RF_FAULT_top50_var.npy"))
+        fault_features = (fault_features - fault_mean) / fault_var
+
         # Imputing on a single example is useless since there is no population to provide ranges or median values
         # Load the fault type model and make a prediction about the type of fault
-        rf_fault_model = joblib.load(os.path.join(lib_dir, 'RF_fault_top50Features.pkl'))
+        rf_fault_model = joblib.load(os.path.join(lib_dir, 'model_files', 'RF_FAULT_top50.sav'))
         fault_id = rf_fault_model.predict(fault_features)
 
         # predict_proba returns a mildly complicated np.array structure for our purposes different than documented.
@@ -202,7 +206,7 @@ class Model(BaseModel):
         # The fault type labels are encoded as numbers.  Need to create a LabelEncoder, load the encodings from disk
         # then "unencode" the fault_id to get the name of the fault type label.
         le = sklearn.preprocessing.LabelEncoder()
-        le.classes_ = np.load(os.path.join(lib_dir, 'le_fault_classes.npy'), allow_pickle=True)
+        le.classes_ = np.load(os.path.join(lib_dir, 'model_files', 'le_fault_classes.npy'))
         fault_name = le.inverse_transform(fault_id)
 
         return {'fault-label': fault_name[0], 'fault-confidence': fault_confidence}
