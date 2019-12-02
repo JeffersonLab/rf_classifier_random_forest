@@ -35,7 +35,19 @@ Run the test target to test the model.
 ```
 
 ### Copy/Link to Certified Area
-Refer to the rf_classifier application instructions for how to install the model into the certified directory tree and create the needed symlinks.
+Refer to the rf_classifier application instructions for how to install the model into the certified directory tree and
+create the needed symlinks.  After copying the model into the desired certified location, you will need to update the
+reference location of the VIRTUAL_ENV environment variable (probably around line 40).
+```bash
+...
+# unset irrelevant variables
+deactivate nondestructive
+
+VIRTUAL_ENV="/some/temp/path/random_forest_vX_Y"  #<--- CHANGE THIS LINE TO MATCH NEW LOCATION
+                                                  #       (e.g., /usr/csite/certified/...)
+export VIRTUAL_ENV
+...
+```
 
 ### Install Step
 ***After having copied the model into /usr/csite/certified/... as directed in the application instructions***, run the setup-certified.bash install command.  This will delete any unnecessary files for model execution.
