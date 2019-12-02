@@ -262,7 +262,7 @@ class BaseModel(ABC):
         if delta > delta_max:
             raise ValueError("Found discrepancies among sample intervals.  Range of intervals is {}".format(delta))
 
-    def validate_cavity_modes(self, mode=4, offset=-1.0):
+    def validate_cavity_modes(self, mode=4, offset=-1.0, deployment='ops'):
         """Checks that each cavity was in the appropriate control mode.
 
         A request is made to the internal CEBAF myaweb myquery HTTP service at the specified offset from the event
@@ -312,7 +312,7 @@ class BaseModel(ABC):
         # Get the bypassed bitword.  Check each cavity's status in the loop below.
         bypassed = None
         try:
-            bypassed = mya.get_pv_value(PV=bypassed_template.format(zone), datetime=datetime, deployment='ops')
+            bypassed = mya.get_pv_value(PV=bypassed_template.format(zone), datetime=datetime, deployment=deployment)
         except ValueError:
             # Do nothing here as this bypassed flag was not always archived.  Faults prior to Fall 2019 may predate
             # archival of the R...MOUT PVs
@@ -331,7 +331,7 @@ class BaseModel(ABC):
 
                 # Check if the cavity was gset == 0.  Ops meant to bypass this if so, and we don't care about it's
                 # control mode
-                gset = mya.get_pv_value(PV=gset_template.format(cav), datetime=datetime, deployment='ops')
+                gset = mya.get_pv_value(PV=gset_template.format(cav), datetime=datetime, deployment=deployment)
                 if gset == 0:
                     continue
 
@@ -340,6 +340,6 @@ class BaseModel(ABC):
                 if bypassed_bits[int(cav[3]) - 1] == 0:
                     continue
 
-                val = mya.get_pv_value(PV=mode_template.format(cav), datetime=datetime, deployment='ops')
+                val = mya.get_pv_value(PV=mode_template.format(cav), datetime=datetime, deployment=deployment)
                 if val != mode:
                     raise ValueError("Cavity '" + cav + "' not in GDR mode.  Mode = " + str(val))

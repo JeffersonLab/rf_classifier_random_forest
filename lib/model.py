@@ -32,7 +32,7 @@ class Model(BaseModel):
     Additional documentation is available in the package docs folder.
     """
 
-    def analyze(self):
+    def analyze(self, deployment='ops'):
         """A method for analyzing the data held in event_dir that returns cavity and fault type label information.
 
         This method validates that the capture files and waveform data in event_dir are in the expected format and
@@ -42,7 +42,7 @@ class Model(BaseModel):
         """
 
         # Check that the data we're about to analyze meets any preconditions for our model
-        self.validate_data()
+        self.validate_data(deployment)
 
         (zone, timestamp) = utils.path_to_zone_and_timestamp(self.event_dir)
 
@@ -282,7 +282,7 @@ class Model(BaseModel):
 
         return {'cavity-label': cavity_id, 'cavity-confidence': cavity_confidence}
 
-    def validate_data(self):
+    def validate_data(self, deployment='ops'):
         """Check that the event directory and it's data is of the expected format.
 
         This method inspects the event directory and raises an exception if a problem is found.  The following aspects
@@ -299,7 +299,7 @@ class Model(BaseModel):
         self.validate_capture_file_counts()
         self.validate_capture_file_waveforms()
         self.validate_waveform_times()
-        self.validate_cavity_modes()
+        self.validate_cavity_modes(deployment=deployment)
 
 
 if __name__ == "__main__":
