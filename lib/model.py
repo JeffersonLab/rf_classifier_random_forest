@@ -118,56 +118,56 @@ class Model(BaseModel):
 
         # These are the top 50 features found from analyzing sklearn models - no way to generate this in a loop.
         top_features = [
-            'GLDE__friedrich_coefficients__m_3__r_30__coeff_0',
-            'GASK__friedrich_coefficients__m_3__r_30__coeff_0',
-            'PMES__max_langevin_fixed_point__m_3__r_30',
-            'GASK__friedrich_coefficients__m_3__r_30__coeff_2',
-            'GMES__fft_coefficient__coeff_11__attr_"angle"',
-            'DFQES__friedrich_coefficients__m_3__r_30__coeff_3',
-            'GASK__friedrich_coefficients__m_3__r_30__coeff_1',
-            'GASK__friedrich_coefficients__m_3__r_30__coeff_3',
-            'DFQES__friedrich_coefficients__m_3__r_30__coeff_1',
-            'PLDE__max_langevin_fixed_point__m_3__r_30',
-            'GASK__fft_coefficient__coeff_16__attr_"abs"',
-            'GASK__spkt_welch_density__coeff_2',
-            'QASK__fft_coefficient__coeff_48__attr_"imag"',
-            'GMES__fft_aggregated__aggtype_"skew"',
-            'GASK__change_quantiles__f_agg_"mean"__isabs_False__qh_1.0__ql_0.8',
+            'CRFP__percentage_of_reoccurring_datapoints_to_all_datapoints',
             'CRFP__spkt_welch_density__coeff_2',
+            'CRRP__percentage_of_reoccurring_values_to_all_values',
+            'DETA2__number_crossing_m__m_1',
+            'DFQES__friedrich_coefficients__m_3__r_30__coeff_1',
+            'DFQES__friedrich_coefficients__m_3__r_30__coeff_3',
+            'DFQES__max_langevin_fixed_point__m_3__r_30',
+            'GASK__agg_linear_trend__f_agg_"min"__chunk_len_50__attr_"stderr"',
+            'GASK__change_quantiles__f_agg_"mean"__isabs_False__qh_1.0__ql_0.8',
+            'GASK__fft_coefficient__coeff_16__attr_"abs"',
+            'GASK__fft_coefficient__coeff_48__attr_"abs"',
+            'GASK__fft_coefficient__coeff_80__attr_"abs"',
+            'GASK__friedrich_coefficients__m_3__r_30__coeff_0',
+            'GASK__friedrich_coefficients__m_3__r_30__coeff_1',
+            'GASK__friedrich_coefficients__m_3__r_30__coeff_2',
+            'GASK__friedrich_coefficients__m_3__r_30__coeff_3',
+            'GASK__max_langevin_fixed_point__m_3__r_30',
+            'GASK__spkt_welch_density__coeff_2',
+            'GASK__sum_of_reoccurring_values',
+            'GLDE__energy_ratio_by_chunks__num_segments_10__segment_focus_1',
+            'GLDE__friedrich_coefficients__m_3__r_30__coeff_0',
+            'GLDE__friedrich_coefficients__m_3__r_30__coeff_2',
             'GLDE__quantile__q_0.3',
             'GMES__fft_aggregated__aggtype_"centroid"',
-            'GLDE__friedrich_coefficients__m_3__r_30__coeff_2',
-            'PLDE__minimum',
-            'GASK__fft_coefficient__coeff_48__attr_"abs"',
-            'DETA2__number_crossing_m__m_1',
-            'CRFP__percentage_of_reoccurring_datapoints_to_all_datapoints',
-            'DFQES__max_langevin_fixed_point__m_3__r_30',
-            'QMES__fft_coefficient__coeff_64__attr_"abs"',
+            'GMES__fft_aggregated__aggtype_"skew"',
+            'GMES__fft_coefficient__coeff_11__attr_"angle"',
+            'GMES__fft_coefficient__coeff_94__attr_"angle"',
             'GMES__friedrich_coefficients__m_3__r_30__coeff_0',
-            'GASK__fft_coefficient__coeff_80__attr_"abs"',
-            'CRRP__percentage_of_reoccurring_values_to_all_values',
-            'GASK__max_langevin_fixed_point__m_3__r_30',
-            'IMES__fft_coefficient__coeff_61__attr_"imag"',
+            'IASK__fft_coefficient__coeff_2__attr_"real"',
+            'IASK__fft_coefficient__coeff_4__attr_"imag"',
+            'IASK__fft_coefficient__coeff_6__attr_"angle"',
             'IASK__variance',
             'IMES__agg_linear_trend__f_agg_"var"__chunk_len_10__attr_"intercept"',
-            'PMES__friedrich_coefficients__m_3__r_30__coeff_3',
+            'IMES__change_quantiles__f_agg_"mean"__isabs_False__qh_0.8__ql_0.0',
+            'IMES__fft_coefficient__coeff_61__attr_"imag"',
+            'IMES__mean_second_derivative_central',
+            'PASK__number_peaks__n_5',
+            'PLDE__autocorrelation__lag_6',
+            'PLDE__max_langevin_fixed_point__m_3__r_30',
+            'PLDE__minimum',
+            'PMES__cwt_coefficients__widths_(2, 5, 10, 20)__coeff_6__w_20',
             'PMES__fft_coefficient__coeff_31__attr_"angle"',
             'PMES__friedrich_coefficients__m_3__r_30__coeff_0',
-            'IASK__fft_coefficient__coeff_6__attr_"angle"',
-            'GASK__agg_linear_trend__f_agg_"min"__chunk_len_50__attr_"stderr"',
-            'IMES__mean_second_derivative_central',
-            'PMES__cwt_coefficients__widths_(2, 5, 10, 20)__coeff_6__w_20',
-            'IASK__fft_coefficient__coeff_2__attr_"real"',
-            'QASK__cwt_coefficients__widths_(2, 5, 10, 20)__coeff_14__w_20',
-            'QASK__c3__lag_3',
             'PMES__friedrich_coefficients__m_3__r_30__coeff_1',
-            'PLDE__autocorrelation__lag_6',
-            'IMES__change_quantiles__f_agg_"mean"__isabs_False__qh_0.8__ql_0.0',
-            'IASK__fft_coefficient__coeff_4__attr_"imag"',
-            'PASK__number_peaks__n_5',
-            'GMES__fft_coefficient__coeff_94__attr_"angle"',
-            'GLDE__energy_ratio_by_chunks__num_segments_10__segment_focus_1',
-            'GASK__sum_of_reoccurring_values'
+            'PMES__friedrich_coefficients__m_3__r_30__coeff_3',
+            'PMES__max_langevin_fixed_point__m_3__r_30',
+            'QASK__c3__lag_3',
+            'QASK__cwt_coefficients__widths_(2, 5, 10, 20)__coeff_14__w_20',
+            'QASK__fft_coefficient__coeff_48__attr_"imag"',
+            'QMES__fft_coefficient__coeff_64__attr_"abs"'
         ]
 
         # Setup the extraction settings that identifies which columns are to be extracted
@@ -185,7 +185,14 @@ class Model(BaseModel):
                                                   kind_to_fc_parameters=extraction_settings,
                                                   show_warnings=False)
         logging.getLogger('tsfresh').setLevel(old_level)
+        print(len(top_features))
+        print(fault_features)
+        count = 0
+        for i in fault_features:
+            print(i)
+            count = count + 1
 
+        print(count)
         # The tsfresh features were standardized based on the training data set.  Load those mean and variances, and
         # standardized this data as that is what the model is expecting
         fault_mean = np.load(os.path.join(lib_dir, "model_files", "RF_FAULT_top50_mean.npy"))
