@@ -40,13 +40,14 @@ test () {
     python3 test/test_model.py
 }
 
-# This is weird to my sensibilities, but we install by removing unecessary components the git repo
+# This is weird to my sensibilities, but we install by removing unnecessary components the git repo
 install () {
     echo "installing - removing the .git directory and other files"
     if [ -d .git ] ; then
         rm -rf .git
     fi
     rm requirements.txt
+    rm requirements-dev.txt
 }
 
 compact () {
@@ -58,6 +59,7 @@ compact () {
         rm -rf ./venv
     fi
     rm requirements.txt
+    rm requirements-dev.txt
 }
 
 
