@@ -185,14 +185,7 @@ class Model(BaseModel):
                                                   kind_to_fc_parameters=extraction_settings,
                                                   show_warnings=False)
         logging.getLogger('tsfresh').setLevel(old_level)
-        print(len(top_features))
-        print(fault_features)
-        count = 0
-        for i in fault_features:
-            print(i)
-            count = count + 1
 
-        print(count)
         # The tsfresh features were standardized based on the training data set.  Load those mean and variances, and
         # standardized this data as that is what the model is expecting
         fault_mean = np.load(os.path.join(lib_dir, "model_files", "RF_FAULT_top50_mean.npy"))
