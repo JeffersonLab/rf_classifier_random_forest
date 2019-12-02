@@ -305,8 +305,9 @@ class Model(BaseModel):
 if __name__ == "__main__":
 
     if len(sys.argv) == 1:
-        # Return the description information as JSON
-        print(json.dumps(Model.describe()))
+        # Print an error/help message
+        print("Error: Requires a single argument - the path to an RF waveform event folder")
+        exit(1)
     else:
         # Analyze the faults that were passed
         data = []
