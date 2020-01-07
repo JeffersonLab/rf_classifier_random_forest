@@ -1,0 +1,29 @@
+I.	CAVITY ID (348 examples)
+
+- 4 signals/cavity x 8 cavities
+
+1. use all features (754/signal)
+	+ split to train (70%) and test (30%) using stratify (to keep the balance between classes)
+	+ use GridSearchCV to tune hyperparameters of a Random Forest Classifier
+		= tuned model gives 96.19% (91.14%) accuracy on test data (train data with 3-fold cross-validation)
+
+2. use only "fft_coefficient" features (400/signal)
+	+ split to train (70%) and test (30%) using stratify (to keep the balance between classes)
+	+ evaluate several ML models
+	+ choose Random Forest and use GridSearchCV to tune hyperparameters
+		= tuned model gives 94.29% (93.09%) accuracy on test data (train data with 3-fold cross-validation)
+
+II.	FAULT ID (330 examples)
+
+- 17 signals/cavity x 1 cavity
+
+1. use all features (754/signal)
+	+ split to train (70%) and test (30%) using stratify (to keep the balance between classes)
+	+ evaluate several ML models
+	+ choose RF and use GridSearchCV to tune hyperparameters
+		= tuned model gives 88% accuracy on test data (note, best score from GridSearchCV was 97%)
+
+2. use only top 50 features (50/signal)
+	+ split to train (70%) and test (30%) using stratify (to keep the balance between classes)
+	+ use GridSearchCV to tune hyperparameters of RF
+		= tuned model gives 89% (95%) accuracy on test (train with 5-fold cross-validation) data
