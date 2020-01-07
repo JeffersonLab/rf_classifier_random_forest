@@ -5,12 +5,10 @@ from unittest import TestCase
 import os
 import sys
 
-
 # Put the lib dir at the front of the search path.  Makes the sys.path correct regardless of the context this test is
 # run.
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), "lib")))
 from model import Model
-
 
 exp = {
     '0L04': [
@@ -239,6 +237,7 @@ exp = {
 class TestRandomForest(TestCase):
 
     def test_analyze(self):
+
         # Context manager resets warnings filters to default after code section exits
         # I've spent tons of time trying to figure out why the analyze method and specifically it call of
         # sklearn.externals.joblib.load(...) produces RuntimeWarnings for numpy.ufunc binary incompatibility _ONLY_ when
@@ -250,6 +249,7 @@ class TestRandomForest(TestCase):
                                               "Expected 192 from C header, got 216 from PyObject")
             warnings.filterwarnings("ignore", "numpy.ufunc size changed, may indicate binary incompatibility. "
                                               "Expected 216, got 192")
+            failed = 0
             for zone in exp:
                 for example in exp[zone]:
                     expect = example['result']
@@ -257,7 +257,13 @@ class TestRandomForest(TestCase):
                     print(path)
                     mod = Model(path)
                     result = mod.analyze(deployment='history')
-                    self.assertDictEqual(expect, result)
+                    try:
+                        self.assertDictEqual(expect, result)
+                    except Exception as e:
+                        failed = failed + 1
+                        print(e)
+            if failed > 0:
+                self.fail("Failed {} example tests".format(failed))
 
 
 if __name__ == '__main__':
