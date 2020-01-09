@@ -3,21 +3,23 @@
 <head><title>Random Forest Release Notes</title></head>
 <body>
 <h1>rf_classifier Random Forest Model Release Notes</h1>
-<h2>December 3, 2019 v1.1</h2>
+<h2>January 9, 2020 v1.1</h2>
 <p>Various updates made to support retrained models using improved training process.
 <ul>
     <li>Models saved in a non-pickly format. Hopefully this will help with architecture (32 vs 64 bit) issues</li>
     <li>Features extracted by tsfresh are now standardized (t-scores based on training data population).</li>
-    <li>Documentation updated to include to new jupiter notebook, pip list output, and test set info</li>
-    <li>New requirements.txt file only specifies modules imported by app and not everything exported by pip freeze</li>
+    <li>Documentation updated to include to new jupiter notebook, pip list output, and test set</li>
+    <li>Updated requirements.txt file</li>
 </ul>
 </p>
-<p>Updated methods from analyze() on down to allow caller to specify which MYA deployment to use. Needed for testing</p>
-<p>Updated certified install instructions (in README.MD) to update the VIRTUAL_ENV variable after copying to certified
-    location</p>
-<p>Root directory includes updates requirements.txt, and requirements-certified.txt files which only specify directly
+<p>Updated methods from analyze() on down to allow caller to specify which MYA deployment to use. Needed for testing.</p>
+<p>Updated certified install instructions (in README.MD) to properly handle virtual environment absolute path
+    problems.</p>
+<p>Root directory includes updated requirements.txt and requirements-certified.txt files which only specify directly
     imported packages. New requirements-dev.txt file captures full environment at development time.</p>
-<p>Fixed issue where supplying no event directory generated an exception.  Now it prints an error/usage message.</p>
+<p>Fixed issue where supplying no event directory generated an exception. Now it prints an error/usage message.</p>
+<p>requirements.txt only specifies modules imported by app and not everything exported by pip freeze.</p>
+<p>requirements-certified removed since requirements.txt is now identical.</p>
 <h2>October 17, 2019 v1.0</h2>
 <p>Initial Release</p>
 
