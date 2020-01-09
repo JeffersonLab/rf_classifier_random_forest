@@ -1,9 +1,11 @@
 # rf_classifier_random_forest
-An rf_classifier pluggable model for analyzing CEBAF C100 RF fault waveform data.  This model utilizes a random forest modeling approach.
+An rf_classifier pluggable model for analyzing CEBAF C100 RF fault waveform data.  This model utilizes a random forest 
+modeling approach.
 
 This software was developed against Python 3.6.9 to match the version of CEBAF's and rf_classifier's Python interpreter.
 
-**Note:** Make sure rf_classifier has been installed prior to installing this model.  See the Admin Guide at https://jeffersonlab.github.io/rf_classifier for more details.  
+**Note:** Make sure rf_classifier has been installed prior to installing this model.  See the Admin Guide at 
+https://jeffersonlab.github.io/rf_classifier for more details.  
 
 ## Documentation, Release Notes, etc.
 https://jeffersonlab.github.io/rf_classifier_random_forest
