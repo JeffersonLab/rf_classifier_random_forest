@@ -14,10 +14,11 @@ provides generic instructions for installing elsewhere.  Since this uses a virtu
 place and not copied from a temporary location.  This is because the virtual environment contain hardcoded absolute 
 paths to their installation directory.
 
-**Note: The following steps after "Downloading The Model" must be performed for each installation location.** 
+**Note: The following steps after "Downloading Source (Optional)" must be performed for each installation directory.** 
 
-### Download The Model
-Clone the repository and checkout the desired version to a temporary location.
+### Download Source (Optional)
+As the SQAM, the developer should have given you a code tarball to install.  If not, here is how you would download the
+latest source from github. 
 ```tcsh
 cd /tmp
 git clone https://github.com/JeffersonLab/rf_classifier_random_forest  random_forest_<version>
@@ -27,12 +28,14 @@ git checkout <version>
 ```
 
 ### Build Step
+This model must be built in the location it will be installed in order for the virtual environment to function properly.
+The installation directory is specified in the rf_classifier application certified install guide.
+
 For each install location, run "build" target to generate the virtual environment and download any dependencies.  Each
 install location would have the same path, but on a different architecture.
 ```tcsh
-cp -r /tmp/random_forest_<version> /usr/csite/certified/libexec/rf_classifier_models/
-
-cd /usr/csite/certified/libexec/rf_classifier_models/random_forest_<version>
+cp -r /tmp/random_forest_<version> /path/to/certified/install/dir
+cd /path/to/certified/install/dir
 ./setup-certified.bash build
 ```
 
@@ -42,18 +45,15 @@ Run the test target to test the model.
 ./setup-certified.bash test
 ```
 
-### Copy/Link to Certified Area
-Refer to the rf_classifier application instructions for how to install the model into the rf_classifier application and
-create the needed symlinks.  This will only be done once per version of rf_classifier.
-
 ### Install Step
-***After having copied the model into /usr/csite/certified/... as directed in the application instructions***, run the setup-certified.bash install command.  This will delete any unnecessary files for model execution.
+Rrun the setup-certified.bash install command.  This will delete any unnecessary files for model execution.
 ```tcsh
 ./setup-certified.bash install
 ```
 
 ### Creating Certified Tarball
-Back in the temporary area, add your audit files to docs/audit/ and any updates to the docs/release-notes.html.  Run the compact target to remove everything that isn't needed to be stored.  Then create the tarball.
+Back in the temporary area, add your audit files to docs/audit/ and any updates to the docs/release-notes.html.
+Run the compact target to remove everything that isn't needed to be stored.  Then create the tarball.
 
 ```tcsh
 vi audit/diff<version>.txt
@@ -66,7 +66,8 @@ tar -czf random_forest_<version>.tar.gz random_forest_<version>
 ```
 
 ## General Installation
-These are instructions for how to install this model into a standalone version of rf_classifier that is not part of the Certified Software repository and does not have to contend with supporting multiple architectures.
+These are instructions for how to install this model into a standalone version of rf_classifier that is not part of the
+Certified Software repository and does not have to contend with supporting multiple architectures.
 
 ### Download and Unzip
 Clone the repository into the model directory of your local copy of rf_classifier and checkout the desired version.
@@ -80,7 +81,7 @@ git checkout v<version>
 ```
 
 ### Setup Virtual Environment
-The model was developed using Python 3.6.x.  Create a virtual environment based on that and install the requriements.
+The model was developed using Python 3.6.x.  Create a virtual environment based on that and install the requirements.
 ```tcsh
 /usr/csite/pubtools/python/3.6/bin/python3 -m venv ./venv
 source venv/bin/activate.csh
@@ -95,5 +96,5 @@ python3 -m  test\test_model.py
 
 This model project includes a test script (test_model.py) and data (test-data) that can be used to validate proper 
 functioning of the model after installation.  See the rf_classifier Admin Guide at 
-https://jeffersonlab.github.io/rf_classifier for additional documentation.  The short hand version is that you should run 
-rf_classifier/tests/tester.bash to run all tests associated with all models.
+https://jeffersonlab.github.io/rf_classifier for additional documentation.  The short hand version is that you should
+run rf_classifier/tests/tester.bash to run all tests associated with all models.
