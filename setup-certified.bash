@@ -30,7 +30,7 @@ build () {
         /usr/csite/pubtools/python/3.6/bin/python3 -m venv ./venv
     fi
     source ./venv/bin/activate
-    pip3 install -qq -r requirements-certified.txt
+    pip3 install -qq -r requirements.txt
     deactivate
 }
 
@@ -46,7 +46,6 @@ install () {
     if [ -d .git ] ; then
         rm -rf .git
     fi
-    rm requirements.txt
     rm requirements-dev.txt
 }
 
@@ -58,7 +57,6 @@ compact () {
     if [ -d ./venv ] ; then
         rm -rf ./venv
     fi
-    rm requirements.txt
     rm requirements-dev.txt
 }
 
