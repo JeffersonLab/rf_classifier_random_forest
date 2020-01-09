@@ -9,7 +9,12 @@ This software was developed against Python 3.6.9 to match the version of CEBAF's
 https://jeffersonlab.github.io/rf_classifier_random_forest
 
 ## CEBAF Certified Installation
-This section describes a specific installation procedure used by the SQAM.  The General Installation section below provides generic instructions for installing elsewhere.  This guide assumes you followed the download instructions above and placed the model in /tmp/random_forest.
+This section describes a specific installation procedure used by the SQAM.  The General Installation section below 
+provides generic instructions for installing elsewhere.  Since this uses a virtual environment, it must be "built" in 
+place and not copied from a temporary location.  This is because the virtual environment contain hardcoded absolute 
+paths to their installation directory.
+
+**Note: The following steps after "Downloading The Model" must be performed for each installation location.** 
 
 ### Download The Model
 Clone the repository and checkout the desired version to a temporary location.
@@ -22,9 +27,12 @@ git checkout <version>
 ```
 
 ### Build Step
-From the temporary location, run "build" target to generate the virtual environment and download any dependencies.
+For each install location, run "build" target to generate the virtual environment and download any dependencies.  Each
+install location would have the same path, but on a different architecture.
 ```tcsh
-cd /tmp/random_forest
+cp -r /tmp/random_forest_<version> /usr/csite/certified/libexec/rf_classifier_models/
+
+cd /usr/csite/certified/libexec/rf_classifier_models/random_forest_<version>
 ./setup-certified.bash build
 ```
 
@@ -35,19 +43,8 @@ Run the test target to test the model.
 ```
 
 ### Copy/Link to Certified Area
-Refer to the rf_classifier application instructions for how to install the model into the certified directory tree and
-create the needed symlinks.  After copying the model into the desired certified location, you will need to update the
-reference location of the VIRTUAL_ENV environment variable (probably around line 40).
-```bash
-...
-# unset irrelevant variables
-deactivate nondestructive
-
-VIRTUAL_ENV="/some/temp/path/random_forest_vX_Y"  #<--- CHANGE THIS LINE TO MATCH NEW LOCATION
-                                                  #       (e.g., /usr/csite/certified/...)
-export VIRTUAL_ENV
-...
-```
+Refer to the rf_classifier application instructions for how to install the model into the rf_classifier application and
+create the needed symlinks.  This will only be done once per version of rf_classifier.
 
 ### Install Step
 ***After having copied the model into /usr/csite/certified/... as directed in the application instructions***, run the setup-certified.bash install command.  This will delete any unnecessary files for model execution.
