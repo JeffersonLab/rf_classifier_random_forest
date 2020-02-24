@@ -1,6 +1,7 @@
 pandas==0.23.4
 numpy==1.16.2
 tsfresh==0.13.0
+statsmodels==0.10.2
 scikit-learn==0.20.3
 requests
 jsonschema
