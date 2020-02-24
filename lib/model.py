@@ -209,7 +209,10 @@ class Model(BaseModel):
         # The fault type labels are encoded as numbers.  Need to create a LabelEncoder, load the encodings from disk
         # then "unencode" the fault_id to get the name of the fault type label.
         le = sklearn.preprocessing.LabelEncoder()
-        le.classes_ = np.load(os.path.join(lib_dir, 'model_files', 'le_fault_classes.npy'))
+
+        # Default value of allow_pickle changed in newer versions.  Now =True is required here to allow loading of
+        # objects arrays.
+        le.classes_ = np.load(os.path.join(lib_dir, 'model_files', 'le_fault_classes.npy'), allow_pickle=True)
         fault_name = le.inverse_transform(fault_id)
 
         return {'fault-label': fault_name[0], 'fault-confidence': fault_confidence}
