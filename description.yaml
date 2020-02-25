@@ -1,6 +1,6 @@
 ---
-id: "random_forest_v1_1"
-releaseDate: "December 2, 2019"
+id: "random_forest_v1_1_1"
+releaseDate: "February 25, 2020"
 cavityLabels:
   - 'multiple'
   - '1'
@@ -33,4 +33,5 @@ details: |+2
       Quench, 'Single Cav Turn off, and Multi-cav Turn Off.
 
       This version used a slightly different training process that included standardizing the tsfresh-extracted
-      features.  Additional documentation is available in the package docs folder.
+      features.  Some small windows compatibility fixes were made in this bug fix release.  Additional documentation is
+      available in the package docs folder.  NOTE: This version was not released to ACC certified.
