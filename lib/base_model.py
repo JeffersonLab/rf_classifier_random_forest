@@ -79,13 +79,16 @@ class BaseModel(ABC):
     def parse_capture_file(self, filename):
         """Parses an individual capture file into a Pandas dataframe object.
 
+        Reads all data in as float64 dtypes because a column of all integers will default to integers (e.g., all zeroes)
+
             Args:
                 filename: The name of the file, , relative to event_dir, to be parsed
 
             Returns:
                 dataframe: A pandas dataframe containing the data from the specified capture file
         """
-        return pd.read_csv(os.path.join(self.event_dir, filename), sep="\t", comment='#', skip_blank_lines=True)
+        return pd.read_csv(os.path.join(self.event_dir, filename), sep="\t", comment='#', skip_blank_lines=True,
+                           dtype='float64')
 
     def parse_event_dir(self):
         """Parses the  capture files in the BaseModel's event_dir and sets event_df to the appropriate pandas dataframe.
