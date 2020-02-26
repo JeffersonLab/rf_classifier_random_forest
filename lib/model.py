@@ -7,9 +7,13 @@ import sklearn
 import tsfresh
 import utils
 import json
+
 from tsfresh.utilities.dataframe_functions import impute
 from tsfresh.feature_extraction import settings
+from statsmodels.tsa.ar_model import AR
+from sklearn import preprocessing
 from sklearn.externals import joblib
+
 from base_model import BaseModel
 
 app_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -23,11 +27,11 @@ class Model(BaseModel):
     """
     This model uses random forest models to identify the faulted cavity and fault type of a C100 event.
 
-    This model is based on work done by Chris Tennant, Tom Powers, etc. and represents the initial model used to
-    identify which cavity and fault type is associated with a C100 fault event.  Any individual cavity can be
-    identified as the offending cavity.  Any collection of multiple cavities faulting at the same time are given the
-    generic label of 'multiple'.  The following fault types may be identified by the model: E_Quench, Microphonics,
-    Quench, 'Single Cav Turn off, and Multi-cav Turn Off.
+    This model is based on work done by Chris Tennant, Lasitha Vidyaratne, Tom Powers, etc. and represents a improved
+    model used to identify which cavity and fault type is associated with a C100 fault event.  Any individual cavity can
+    be identified as the offending cavity.  Any collection of multiple cavities faulting at the same time are given the
+    generic label of 'multiple'.  The following fault types may be identified by the model: Controls Fault, E_Quench,
+    Heat Riser Choke, Microphonics, Quench_100ms, Quench_3ms, Single Cav Turn off, and Multi-cav Turn off.
 
     Additional documentation is available in the package docs folder.
     """
@@ -82,6 +86,15 @@ class Model(BaseModel):
 
             Returns:
                 dict:  A dictionary with format {'fault-label': <string_label>, 'fault-confidence': <float in [0,1]>}"
+        """
+
+        self.assert_valid_cavity_number(cavity_number)
+        fault_df = self.get_fault_data(cavity_number)
+        fault_features = self.get_fault_features(fault_df)
+        return self.get_fault_type_results(fault_features)
+
+    def assert_valid_cavity_number(self, cavity_number):
+        """Throws an exception if the supplied integer is not a valid cavity number.
 
             Raises:
                 TypeError: if cavity_number is not an int
@@ -94,8 +107,10 @@ class Model(BaseModel):
         if not (cavity_number <= 8 or cavity_number >= 1):
             raise ValueError("cavity_number must be within span of [1,8]")
 
+    def get_fault_data(self, cavity_number):
+        """Gets the fault data needed for the fault type prediction."""
         # Construct a dictionary for mapping cavity-specific waveform names to generic waveform names.  Used to
-        # rename the dataframe columns into a generic set that can be analyzed by tsfresh regardless of which cavity
+        # rename the DataFrame columns into a generic set that can be analyzed by tsfresh regardless of which cavity
         # is the one to fault.
         waveforms = ('IMES', 'QMES', 'GMES', 'PMES', 'IASK', 'QASK', 'GASK', 'PASK', 'CRFP', 'CRFPP', 'CRRP', 'CRRPP',
                      'GLDE', 'PLDE', 'DETA2', 'CFQE2', 'DFQES')
@@ -116,58 +131,66 @@ class Model(BaseModel):
             raise ValueError("Fault label dataset has improper dimensions.  Expected (8192," +
                              str(len(fault_columns)) + ") received " + ascii(fault_df.shape))
 
+        return fault_df
+
+    def get_fault_features(self, fault_df):
+        """Returns the extracted features needed for fault type prediction.
+
+        Expects IMES, QMES, GMES, PMES, IASK, QASK, GASK, PASK, CRFP, CRFPP, CRRP CRRPP, GLDE, PLDE, DETA2, CFQE2, and
+        DFQES signals for the faulted cavity.
+        """
+
         # These are the top 50 features found from analyzing sklearn models - no way to generate this in a loop.
-        top_features = ['GMES__fft_coefficient__coeff_16__attr_"real"',
-                        'PLDE__fft_coefficient__coeff_16__attr_"real"',
-                        'GMES__fft_coefficient__coeff_11__attr_"angle"',
-                        'PMES__index_mass_quantile__q_0.9',
-                        'CRRP__fft_coefficient__coeff_64__attr_"imag"',
-                        'CRRP__fft_coefficient__coeff_79__attr_"abs"',
-                        'CRFP__ar_coefficient__k_10__coeff_1',
-                        'GMES__fft_coefficient__coeff_63__attr_"imag"',
-                        'PMES__fft_coefficient__coeff_0__attr_"abs"',
-                        'CRRP__maximum',
-                        'PMES__index_mass_quantile__q_0.8',
-                        'GMES__fft_coefficient__coeff_30__attr_"imag"',
-                        'GMES__fft_coefficient__coeff_79__attr_"angle"',
-                        'IMES__change_quantiles__f_agg_"var"__isabs_True__qh_1.0__ql_0.8',
-                        'IMES__fft_coefficient__coeff_2__attr_"abs"',
+        top_features = ['GMES__augmented_dickey_fuller__attr_"usedlag"',
+                        'CRFP__maximum',
+                        'CRFP__agg_linear_trend__f_agg_"var"__chunk_len_50__attr_"stderr"',
+                        'GASK__fft_coefficient__coeff_64__attr_"abs"',
+                        'CRFP__augmented_dickey_fuller__attr_"teststat"',
+                        'GMES__change_quantiles__f_agg_"var"__isabs_True__qh_0.6__ql_0.4',
+                        'CRFP__augmented_dickey_fuller__attr_"pvalue"',
+                        'QMES__augmented_dickey_fuller__attr_"usedlag"',
+                        'GMES__change_quantiles__f_agg_"var"__isabs_False__qh_0.8__ql_0.6',
+                        'PLDE__augmented_dickey_fuller__attr_"usedlag"',
+                        'CRFP__change_quantiles__f_agg_"mean"__isabs_True__qh_1.0__ql_0.8',
+                        'CRFP__fft_coefficient__coeff_96__attr_"abs"',
+                        'GMES__change_quantiles__f_agg_"mean"__isabs_True__qh_0.8__ql_0.6',
+                        'IMES__change_quantiles__f_agg_"var"__isabs_True__qh_0.6__ql_0.4',
+                        'PLDE__partial_autocorrelation__lag_5',
                         'PLDE__minimum',
-                        'PLDE__fft_coefficient__coeff_28__attr_"real"',
-                        'IMES__change_quantiles__f_agg_"var"__isabs_False__qh_1.0__ql_0.8',
-                        'CRRP__agg_linear_trend__f_agg_"min"__chunk_len_10__attr_"stderr"',
-                        'DFQES__fft_coefficient__coeff_52__attr_"abs"',
-                        'CRRP__approximate_entropy__m_2__r_0.5',
-                        'CRRP__fft_coefficient__coeff_29__attr_"abs"',
-                        'CRRP__fft_coefficient__coeff_48__attr_"imag"',
+                        'GMES__change_quantiles__f_agg_"var"__isabs_True__qh_0.8__ql_0.6',
+                        'QMES__approximate_entropy__m_2__r_0.5',
+                        'PLDE__max_langevin_fixed_point__m_3__r_30',
+                        'QASK__fft_coefficient__coeff_17__attr_"abs"',
+                        'CRFP__agg_linear_trend__f_agg_"var"__chunk_len_50__attr_"slope"',
+                        'CRFP__fft_coefficient__coeff_48__attr_"abs"',
+                        'GMES__change_quantiles__f_agg_"var"__isabs_False__qh_0.6__ql_0.4',
+                        'GMES__number_cwt_peaks__n_1',
+                        'CRFP__ar_coefficient__k_10__coeff_0',
+                        'QMES__approximate_entropy__m_2__r_0.7',
+                        'GASK__fft_aggregated__aggtype_"skew"',
+                        'CRRP__longest_strike_above_mean',
+                        'PLDE__partial_autocorrelation__lag_6',
+                        'IMES__change_quantiles__f_agg_"mean"__isabs_True__qh_0.6__ql_0.4',
+                        'PLDE__fft_coefficient__coeff_82__attr_"real"',
+                        'CRFP__ratio_beyond_r_sigma__r_1.5',
+                        'PLDE__friedrich_coefficients__m_3__r_30__coeff_0',
+                        'IMES__fft_coefficient__coeff_11__attr_"abs"',
+                        'GASK__ratio_beyond_r_sigma__r_6',
+                        'GASK__change_quantiles__f_agg_"mean"__isabs_True__qh_1.0__ql_0.8',
+                        'QASK__fft_aggregated__aggtype_"skew"',
+                        'IMES__change_quantiles__f_agg_"var"__isabs_False__qh_0.6__ql_0.4',
+                        'IASK__fft_aggregated__aggtype_"skew"',
+                        'DETA2__longest_strike_above_mean',
+                        'CRRPP__quantile__q_0.9',
+                        'GASK__fft_aggregated__aggtype_"centroid"',
+                        'QASK__change_quantiles__f_agg_"var"__isabs_True__qh_1.0__ql_0.0',
+                        'PLDE__partial_autocorrelation__lag_2',
                         'DFQES__ratio_value_number_to_time_series_length',
-                        'PMES__number_peaks__n_5',
-                        'PMES__energy_ratio_by_chunks__num_segments_10__segment_focus_5',
-                        'PLDE__fft_coefficient__coeff_49__attr_"angle"',
-                        'IMES__agg_linear_trend__f_agg_"max"__chunk_len_10__attr_"slope"',
-                        'CRRP__agg_linear_trend__f_agg_"var"__chunk_len_10__attr_"intercept"',
-                        'GASK__ar_coefficient__k_10__coeff_1',
-                        'CRRP__fft_coefficient__coeff_75__attr_"angle"',
-                        'IASK__fft_coefficient__coeff_45__attr_"abs"',
-                        'DETA2__number_peaks__n_3',
-                        'CRFPP__percentage_of_reoccurring_values_to_all_values',
-                        'CRRP__fft_coefficient__coeff_64__attr_"angle"',
-                        'GMES__fft_coefficient__coeff_28__attr_"real"',
-                        'CRRP__fft_coefficient__coeff_31__attr_"abs"',
-                        'CRRP__fft_coefficient__coeff_96__attr_"imag"',
-                        'GASK__ratio_beyond_r_sigma__r_10',
-                        'PLDE__fft_coefficient__coeff_33__attr_"real"',
-                        'CRRP__fft_coefficient__coeff_33__attr_"abs"',
-                        'CRRP__standard_deviation',
-                        'GMES__spkt_welch_density__coeff_5',
-                        'CRRP__fft_coefficient__coeff_76__attr_"abs"',
-                        'PLDE__fft_coefficient__coeff_17__attr_"abs"',
-                        'DFQES__fft_coefficient__coeff_51__attr_"abs"',
-                        'CRFP__time_reversal_asymmetry_statistic__lag_1',
-                        'DFQES__fft_coefficient__coeff_50__attr_"real"',
-                        'IMES__linear_trend__attr_"rvalue"',
-                        'PMES__energy_ratio_by_chunks__num_segments_10__segment_focus_9'
-                        ]
+                        'PLDE__fft_coefficient__coeff_43__attr_"angle"',
+                        'CRFP__percentage_of_reoccurring_datapoints_to_all_datapoints',
+                        'CRFP__change_quantiles__f_agg_"var"__isabs_True__qh_1.0__ql_0.8',
+                        'QASK__spkt_welch_density__coeff_5',
+                        'PLDE__autocorrelation__lag_9']
 
         # Setup the extraction settings that identifies which columns are to be extracted
         extraction_settings = settings.from_columns(top_features)
@@ -195,9 +218,13 @@ class Model(BaseModel):
         fault_var = np.load(os.path.join(lib_dir, "model_files", "RF_FAULT_top50_var.npy"))
         fault_features = (fault_features - fault_mean) / fault_var
 
+        return fault_features
+
+    def get_fault_type_results(self, fault_features):
+        """Get the fault type label and the confidence associated with the given fault features."""
         # Imputing on a single example is useless since there is no population to provide ranges or median values
         # Load the fault type model and make a prediction about the type of fault
-        rf_fault_model = joblib.load(os.path.join(lib_dir, 'model_files', 'RF_FAULT_top50.sav'))
+        rf_fault_model = joblib.load(os.path.join(lib_dir, 'model_files', 'RF_FAULT_top50_01292020.sav'))
         fault_id = rf_fault_model.predict(fault_features)
 
         # predict_proba returns a mildly complicated np.array structure for our purposes different than documented.
@@ -224,52 +251,74 @@ class Model(BaseModel):
                 dict:  A dictionary with format {'cavity-label': <string_label>, 'cavity-confidence': <float in [0,1]>}"
         """
 
+        # Get the data needed to perform the cavity prediction
+        cavity_df = self.get_cavity_data()
+
+        # Extract the features from the waveform data
+        cavity_features = self.get_cavity_features(cavity_df)
+
+        # Get the results of the model
+        cavity_results = self.get_cavity_results(cavity_features)
+
+        return cavity_results
+
+    def get_cavity_data(self):
+        """Gets the subset of waveform data needed for the cavity label prediction"""
+
         # Need to reduce the number of waveforms in order to reduce the computational complexity of feature extraction.
         # These were selected since this is what SRF experts use to "manually" determine which cavity faulted.
         cavity_label_waveforms = [
-            "Time", "id",
-            "1_GMES", "1_GASK", "1_CRFP", "1_DETA2",
-            "2_GMES", "2_GASK", "2_CRFP", "2_DETA2",
-            "3_GMES", "3_GASK", "3_CRFP", "3_DETA2",
-            "4_GMES", "4_GASK", "4_CRFP", "4_DETA2",
-            "5_GMES", "5_GASK", "5_CRFP", "5_DETA2",
-            "6_GMES", "6_GASK", "6_CRFP", "6_DETA2",
-            "7_GMES", "7_GASK", "7_CRFP", "7_DETA2",
-            "8_GMES", "8_GASK", "8_CRFP", "8_DETA2"
+            # "Time", "id",
+            "1_GMES", "1_GASK", "1_CRFP", "1_CRFPP", "1_DETA2",
+            "2_GMES", "2_GASK", "2_CRFP", "2_CRFPP", "2_DETA2",
+            "3_GMES", "3_GASK", "3_CRFP", "3_CRFPP", "3_DETA2",
+            "4_GMES", "4_GASK", "4_CRFP", "4_CRFPP", "4_DETA2",
+            "5_GMES", "5_GASK", "5_CRFP", "5_CRFPP", "5_DETA2",
+            "6_GMES", "6_GASK", "6_CRFP", "6_CRFPP", "6_DETA2",
+            "7_GMES", "7_GASK", "7_CRFP", "7_CRFPP", "7_DETA2",
+            "8_GMES", "8_GASK", "8_CRFP", "8_CRFPP", "8_DETA2"
         ]
 
         # Subset the event dataframe to contain only the needed waveforms.
         cavity_df = self.event_df.loc[:, cavity_label_waveforms]
 
-        # This is probably an unnecessary check, but it's good to be safe
+        # This is probably an unnecessary check, but it's good to be safe.
         if cavity_df.shape != (8192, len(cavity_label_waveforms)):
             raise ValueError("Cavity label dataset has improper dimensions.  Expected (8192," +
                              str(len(cavity_label_waveforms)) + ") received " + ascii(cavity_df.shape))
 
-        # Setup the dictionary that specifies which features will be extracted from the data
-        fft_only = {'fft_coefficient': []}
-        for attr in ('real', 'imag', 'abs', 'angle'):
-            for coeff in range(0, 100):  # produces [0, 1, ..., 99]
-                fft_only['fft_coefficient'].append({'attr': attr, 'coeff': coeff})
+        return cavity_df
 
-        # Extract the features needed to identify which cavity faulted
-        cavity_features = tsfresh.extract_features(cavity_df.astype('float64'),
-                                                   disable_progressbar=True,
-                                                   column_sort="Time",
-                                                   column_id="id",
-                                                   impute_function=impute,
-                                                   default_fc_parameters=fft_only
-                                                   )
+    def get_cavity_features(self, cavity_df):
+        """Computes the extracted features needed for the cavity model based on the supplied signals.
 
-        # The training data was standardized (i.e., transformed to a t-score based on data in training set).  Here
-        # we load those mean and variance values and standardized this data in the same way
-        cavity_mean = np.load(os.path.join(lib_dir, "model_files", "RF_CAVITY_fft_only_data_mean.npy"))
-        cavity_var = np.load(os.path.join(lib_dir, "model_files", "RF_CAVITY_fft_only_data_var.npy"))
-        cavity_features = (cavity_features - cavity_mean) / cavity_var
+            Args:
+                cavity_df (pd.DataFrame): A DataFrame with one waveform signal per column.  Does not expect an ID
+                                            or time column, only cavity waveform values.
+
+            Returns DataFrame:  A DataFrame of cavity features, one per column.
+        """
+
+        # Standardized the signals to z-scores
+        signal_scaler = preprocessing.StandardScaler(copy=True, with_mean=True, with_std=True)
+        signals = signal_scaler.fit_transform(cavity_df)
+
+        # Make a call to run auto-regression method and return it's results
+        return self.get_stat_AR_coefficients(signals, 5)
+
+    def get_cavity_results(self, cavity_features):
+        """Loads the underlying model and performs the predictions.
+
+        This model expects AR features with max_lag=5, based on standardized GMES, GASK, CRFP, CRFPP, DETA2 from all
+        eight cavities.
+
+            Returns dictionary:  A dictionary containing both the cavity-label and cavity-confidence.
+        """
+        # Load the cavity model
+        rf_cav_model = joblib.load(os.path.join(lib_dir, "model_files", 'RF_CAVITY_AR_02202020.sav'))
 
         # Load the model from disk and make a prediction about which cavity faulted first.  The predict() method returns
         # an array of results.  We only have one result, so pull it out of the array structure now
-        rf_cav_model = joblib.load(os.path.join(lib_dir, 'model_files', 'RF_CAVITY_fft_only_data.sav'))
         cavity_id = rf_cav_model.predict(cavity_features)
         cavity_id = cavity_id[0]
 
@@ -287,6 +336,35 @@ class Model(BaseModel):
             cavity_id = str(cavity_id)
 
         return {'cavity-label': cavity_id, 'cavity-confidence': cavity_confidence}
+
+    # noinspection PyPep8Naming
+    def get_stat_AR_coefficients(self, signals, max_lag):
+        """Get the auto-regression coefficients for a set of time series signals.
+
+            Args:
+                signals (DataFrame): A Pandas DataFrame of waveforms, one per column
+                max_lag (float): The maximum number of AR coefficients to return.  Will be zero padded if model requires
+                                  less than the number specified.
+
+            Returns DataFrame: A dataframe that contains a single row where each column is a parameter coefficient.
+        """
+        for i in range(0, np.shape(signals)[1]):
+            model = AR(signals[:, i])
+            model_fit = model.fit(maxlag=max_lag, ic=None)
+            if np.shape(model_fit.params)[0] < max_lag + 1:
+                parameters = np.pad(model_fit.params, (0, max_lag + 1 - np.shape(model_fit.params)[0]), 'constant',
+                                    constant_values=0)
+            elif np.shape(model_fit.params)[0] > max_lag + 1:
+                parameters = model_fit.params[: max_lag]
+            else:
+                parameters = model_fit.params
+
+            if i == 0:
+                coefficients = parameters
+            else:
+                coefficients = np.append(coefficients, parameters, axis=0)
+
+        return pd.DataFrame(coefficients).T
 
     def validate_data(self, deployment='ops'):
         """Check that the event directory and it's data is of the expected format.
@@ -308,8 +386,7 @@ class Model(BaseModel):
         self.validate_cavity_modes(deployment=deployment)
 
 
-if __name__ == "__main__":
-
+def main():
     if len(sys.argv) == 1:
         # Print an error/help message
         print("Error: Requires a single argument - the path to an RF waveform event folder")
@@ -356,3 +433,7 @@ if __name__ == "__main__":
                 data.append({'error': error, 'path': path})
 
         print(json.dumps({'data': data}))
+
+
+if __name__ == "__main__":
+    main()
