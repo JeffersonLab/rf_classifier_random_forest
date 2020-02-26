@@ -1,6 +1,6 @@
 ---
-id: "random_forest_v1_1_1"
-releaseDate: "February 25, 2020"
+id: "random_forest_v1_2"
+releaseDate: "TBD"
 cavityLabels:
   - 'multiple'
   - '1'
@@ -12,26 +12,28 @@ cavityLabels:
   - '7'
   - '8'
 faultLabels:
+  - 'Controls Fault'
   - 'E_Quench'
+  - 'Heat Riser Choke'
   - 'Microphonics'
-  - 'Quench'
+  - 'Multi Cav turn off'
+  - 'Quench_100ms'
+  - 'Quench_3ms'
   - 'Single Cav Turn off'
-  - 'Multi Cav Turn off'
-trainingData: "(Spring 2018) 2018_04_24 - 2018_05_06"
+
+trainingData: "(Spring 2019) 2018_04_24 - 2018_05_06"
 brief: "Uses random forests ensemble method for analysis"
 # This is YAML's block scaler with block-chomping set to keep final newlines, and an indent indicator (|+2) or
 # 2.  This means to keep the newline formatting, keep initial indents after the first two spaces, and keep
 # the final newlines.  This string gets present exactly as is in model listings.
 details: |+2
 
-      This model uses random forest models to identify the faulted cavity and fault type of a C100 event.
+    This model uses random forest models to identify the faulted cavity and fault type of a C100 event.
 
-      This model is based on work done by Chris Tennant, Tom Powers, etc. and represents the initial model used to
-      identify which cavity and fault type is associated with a C100 fault event.  Any individual cavity can be
-      identified as the offending cavity.  Any collection of multiple cavities faulting at the same time are given the
-      generic label of 'multiple'.  The following fault types may be identified by the model: E_Quench, Microphonics,
-      Quench, 'Single Cav Turn off, and Multi-cav Turn Off.
+    This model is based on work done by Chris Tennant, Lasitha Vidyaratne, Tom Powers, etc. and represents a improved
+    model used to identify which cavity and fault type is associated with a C100 fault event.  Any individual cavity can
+    be identified as the offending cavity.  Any collection of multiple cavities faulting at the same time are given the
+    generic label of 'multiple'.
 
-      This version used a slightly different training process that included standardizing the tsfresh-extracted
-      features.  Some small windows compatibility fixes were made in this bug fix release.  Additional documentation is
-      available in the package docs folder.  NOTE: This version was not released to ACC certified.
+    This version used a different training process that directly uses the statsmodel package to perform feature
+    extraction.  Additional documentation is available in the package docs folder.
