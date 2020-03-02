@@ -2,6 +2,7 @@ import os
 import sys
 import pandas as pd
 import numpy as np
+import math
 import logging
 import sklearn
 import tsfresh
@@ -65,7 +66,7 @@ class Model(BaseModel):
         # unreliable and we should short circuit and report only a multi-cavity fault type (likely someone performing
         # a zone wide operation triggering a "fault").  Use the cavity confidence since it is the prediction we're
         # basing this on.
-        fault_results = {'fault-label': 'Multi Cav Turn off', 'fault-confidence': cav_results['cavity-confidence']}
+        fault_results = {'fault-label': 'Multi Cav turn off', 'fault-confidence': cav_results['cavity-confidence']}
         if cav_results['cavity-label'] != 'multiple':
             fault_results = self.get_fault_type_label(int(cav_results['cavity-label']))
 
@@ -200,6 +201,7 @@ class Model(BaseModel):
         # warning.  We want the zero, but don't want the warning so adjust the logging levels temporarily
         old_level = logging.getLogger('tsfresh').getEffectiveLevel()
         logging.getLogger('tsfresh').setLevel(logging.ERROR)
+
         fault_features = tsfresh.extract_features(fault_df.astype("float64"), column_id="id", column_sort="Time",
                                                   disable_progressbar=True,
                                                   impute_function=impute,
@@ -299,12 +301,34 @@ class Model(BaseModel):
             Returns DataFrame:  A DataFrame of cavity features, one per column.
         """
 
+        # The standard scaler has issues with constant waveforms and sometimes returns +/-1 instead of zero.
+        # This can cause exceptions in the follow on AR calls.
+        signals = self.set_constant_waveforms_to_zero(cavity_df)
+
         # Standardized the signals to z-scores
         signal_scaler = preprocessing.StandardScaler(copy=True, with_mean=True, with_std=True)
-        signals = signal_scaler.fit_transform(cavity_df)
+        signals = signal_scaler.fit_transform(signals)
 
         # Make a call to run auto-regression method and return it's results
         return self.get_stat_AR_coefficients(signals, 5)
+
+    def set_constant_waveforms_to_zero(self, df):
+        """Set constant waveforms to all zero value.
+
+        Expects a DataFrame with waveforms in columns.
+
+            Args:
+                df (DataFrame):  DataFrame of waveform values, one waveform per column
+
+            Returns (DataFrame): A new DataFrame where the constant waveforms have been set to zero
+        """
+
+        out = df.copy()
+        for column in out.columns:
+            if np.max(out[column]) == np.min(out[column]):
+                out[column].values[:] = 0
+
+        return out
 
     def get_cavity_results(self, cavity_features):
         """Loads the underlying model and performs the predictions.
@@ -349,15 +373,21 @@ class Model(BaseModel):
             Returns DataFrame: A dataframe that contains a single row where each column is a parameter coefficient.
         """
         for i in range(0, np.shape(signals)[1]):
-            model = AR(signals[:, i])
-            model_fit = model.fit(maxlag=max_lag, ic=None)
-            if np.shape(model_fit.params)[0] < max_lag + 1:
-                parameters = np.pad(model_fit.params, (0, max_lag + 1 - np.shape(model_fit.params)[0]), 'constant',
-                                    constant_values=0)
-            elif np.shape(model_fit.params)[0] > max_lag + 1:
-                parameters = model_fit.params[: max_lag]
+
+            # The AR model throws for some constant signals.  The signals should have been normalized into z-scores, in
+            # which case the parameters for an all zero signal are all zero.
+            if self.is_constant_signal(signals[i]) and signals[0, i] == 0:
+                parameters = np.append((np.zeros(max_lag + 1)))
             else:
-                parameters = model_fit.params
+                model = AR(signals[:, i])
+                model_fit = model.fit(maxlag=max_lag, ic=None)
+                if np.shape(model_fit.params)[0] < max_lag + 1:
+                    parameters = np.pad(model_fit.params, (0, max_lag + 1 - np.shape(model_fit.params)[0]), 'constant',
+                                        constant_values=0)
+                elif np.shape(model_fit.params)[0] > max_lag + 1:
+                    parameters = model_fit.params[: max_lag]
+                else:
+                    parameters = model_fit.params
 
             if i == 0:
                 coefficients = parameters
@@ -365,6 +395,30 @@ class Model(BaseModel):
                 coefficients = np.append(coefficients, parameters, axis=0)
 
         return pd.DataFrame(coefficients).T
+
+    def is_constant_signal(self, signal):
+        """Is the supplied signal array only contains a single value, excluding NaN.  However, all NaNs returns true"""
+
+        # Skip any NaNs
+        start = 0
+        length = len(signal)
+        while start < length and math.isnan(signal[start]):
+            start += 1
+
+        # Only NaNs so return True (constant in some fashion)
+        if start == length:
+            return True
+
+        # Work through the rest of the array, skipping NaNs
+        prev = signal[start]
+        for i in range(start + 1, len(signal)):
+            if math.isnan(signal[i]):
+                continue
+            if prev != signal[i]:
+                return False
+            prev = signal[i]
+
+        return True
 
     def validate_data(self, deployment='ops'):
         """Check that the event directory and it's data is of the expected format.
