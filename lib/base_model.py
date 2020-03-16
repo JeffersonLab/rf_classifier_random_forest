@@ -12,13 +12,13 @@ import utils
 class BaseModel(ABC):
     """An abstract class defining the model API and providing several useful concrete functions.
 
-    Inheriting from this class requires that both the describe and analzye methods be defined which form the basis of
+    Inheriting from this class requires that both the describe and analyze methods be defined which form the basis of
     the model API.  This class provides a number of concrete methods that can be used to perform data processing and
     validation.  Child classes may use these directly or as a guide for writing their own.
 
     Attributes:
         event_dir (str): The path to the event directory being analyzed by this model object.
-        event_df  (pandas.dataframe): A Pandas dataframe containing the parsed waveform data from event_dir.
+        event_df  (pandas.DataFrame): A Pandas DataFrame containing the parsed waveform data from event_dir.
 
     """
     file_regex = re.compile(r"R.*harv\..*\.txt")
@@ -31,6 +31,7 @@ class BaseModel(ABC):
         """
         self.event_dir = event_dir
         self.event_df = None
+        self.zone_name = os.path.split(os.path.split(self.event_dir)[0])[-1]
 
     @abstractmethod
     def analyze(self):
@@ -44,7 +45,8 @@ class BaseModel(ABC):
 
 
             Returns:
-                dict: A dictionary containing the results of the analysis.  Detailed key/value information given in the table below.
+                dict: A dictionary containing the results of the analysis.  Detailed key/value information given in the
+                table below.
 
             +---------------------+------------+-----------------------------------------------------------------+
             | Key                 | Value Type | Value Descriptions                                              |
@@ -64,7 +66,8 @@ class BaseModel(ABC):
         """
         pass
 
-    def is_capture_file(self, filename):
+    @staticmethod
+    def is_capture_file(filename):
         """Validates if filename appears to be a valid capture file.
 
             Args:
@@ -75,9 +78,9 @@ class BaseModel(ABC):
         """
         return BaseModel.file_regex.match(filename)
 
-    # Parse the capture file specified by name (not full path) and return a pandas dataframe
+    # Parse the capture file specified by name (not full path) and return a pandas DataFrame
     def parse_capture_file(self, filename):
-        """Parses an individual capture file into a Pandas dataframe object.
+        """Parses an individual capture file into a Pandas DataFrame object.
 
         Reads all data in as float64 dtypes because a column of all integers will default to integers (e.g., all zeroes)
 
@@ -85,13 +88,13 @@ class BaseModel(ABC):
                 filename: The name of the file, , relative to event_dir, to be parsed
 
             Returns:
-                dataframe: A pandas dataframe containing the data from the specified capture file
+                DataFrame: A pandas DataFrame containing the data from the specified capture file
         """
         return pd.read_csv(os.path.join(self.event_dir, filename), sep="\t", comment='#', skip_blank_lines=True,
                            dtype='float64')
 
     def parse_event_dir(self):
-        """Parses the  capture files in the BaseModel's event_dir and sets event_df to the appropriate pandas dataframe.
+        """Parses the  capture files in the BaseModel's event_dir and sets event_df to the appropriate pandas DataFrame.
 
         The waveform names are converted from <EPICS_NAME><Waveform> (e.g., R123WFSGMES), to <Cavity_Number>_<Waveform>
         (e.g., 3_GMES).  This allows analysis code to more easily handle waveforms from different zones.
@@ -176,7 +179,7 @@ class BaseModel(ABC):
         req_signals = ["IMES", "QMES", "GMES", "PMES", "IASK", "QASK", "GASK", "PASK", "CRFP", "CRFPP",
                        "CRRP", "CRRPP", "GLDE", "PLDE", "DETA2", "CFQE2", "DFQES"]
 
-        # Will contain regexs that are used to check for required waveforms, and the count of how many matches
+        # Will contain regex's that are used to check for required waveforms, and the count of how many matches
         req_waveforms = {re.compile("Time"): 0}
         for sig in req_signals:
             for cav in [1, 2, 3, 4, 5, 6, 7, 8]:
@@ -218,14 +221,14 @@ class BaseModel(ABC):
                     raise ValueError(
                         "Model could not identify require waveform matching pattern '" + pattern.pattern + "'")
 
-    def validate_waveform_times(self, time_limits=(-1600, 1600), delta_max=0.025):
+    def validate_waveform_times(self, max_start=-300.0, min_end=100.0, step_size=0.2, delta_max=0.01):
         """Verify the Time column of all capture files are identical and have a valid range and sample interval.
 
             Args:
-                time_limits (tuple): A two-valued tuple (min_t, max_t) which gives the minimum and maximum time values
-                    that are allowed for a valid waveform.  Values in milliSeconds.
-                delta_max (float): The maximum difference between the smallest and largest time steps in milliseconds.
-                    (default is 0.025)
+                max_start (float): The latest acceptable start time for the waveforms
+                min_end (float): The earliest acceptable end time for the waveforms
+                step_size (float): The expected step_size of each waveform in milliseconds
+                delta_max (float): The maximum difference between the observed time steps and step_size in milliseconds.
 
             Returns:
                 None
@@ -251,19 +254,20 @@ class BaseModel(ABC):
         # Check that the time range is somewhere in the [-1.6s, 1.6s] range
         min_t = min(time)
         max_t = max(time)
-        if min_t < time_limits[0] or max_t > time_limits[1]:
+        if max_start < min_t or min_end > max_t:
             raise ValueError(
-                "Invalid time range of [{},{}] found outside of normal [{}, {}] bounds".format(min_t, max_t,
-                                                                                               time_limits[0],
-                                                                                               time_limits[1]))
+                "Invalid time range of [{},{}] found.  Does not include minimum range for fault data [{}, {}]"
+                .format(min_t, max_t, max_start, min_end))
 
         # Check that the time sample interval is approximately the same.  Since this is floating point, there may be
         # slight differences
         lag = time - time.shift(1)
         lag = lag[1:len(lag)]
-        delta = max(lag) - min(lag)
-        if delta > delta_max:
-            raise ValueError("Found discrepancies among sample intervals.  Range of intervals is {}".format(delta))
+        max_step = max(lag)
+        min_step = min(lag)
+        if abs(step_size - max_step) > delta_max or abs(step_size - min_step):
+            raise ValueError("Found improper step size.  Expect: {}, Step size range: ({}, {}), Acceptable delta: {}"
+                             .format(step_size, min_step, max_step, delta_max))
 
     def validate_cavity_modes(self, mode=4, offset=-1.0, deployment='ops'):
         """Checks that each cavity was in the appropriate control mode.
@@ -285,6 +289,7 @@ class BaseModel(ABC):
             Args:
                 mode (int):  The mode number associated with the proper control mode.
                 offset (float): The number of seconds before the fault event the mode setting should be checked.
+                deployment (str): The MYA archiver deployment used for querying historical PV values
 
             Returns:
                 None
@@ -306,11 +311,14 @@ class BaseModel(ABC):
         datetime = utils.path_to_datetime(self.event_dir) + timedelta(seconds=offset)
 
         # We need the zone to check the bypass bitword that has bit 0-7 corresponding to cavity 1-8
+        zone = None
         for filename in os.listdir(self.event_dir):
             if not self.is_capture_file(filename):
                 continue
             zone = filename[0:3]
             break
+        if zone is None:
+            raise ValueError("Could parse zone name from capture file name")
 
         # Get the bypassed bitword.  Check each cavity's status in the loop below.
         bypassed = None
@@ -318,7 +326,7 @@ class BaseModel(ABC):
             bypassed = mya.get_pv_value(PV=bypassed_template.format(zone), datetime=datetime, deployment=deployment)
         except ValueError:
             # Do nothing here as this bypassed flag was not always archived.  Faults prior to Fall 2019 may predate
-            # archival of the R...MOUT PVs
+            # archival of the R...XMOUT PVs
             pass
 
         # Switch to binary string.  "08b" means include leading zeros ("0"), have eight bits ("8"), and format string as
@@ -346,3 +354,16 @@ class BaseModel(ABC):
                 val = mya.get_pv_value(PV=mode_template.format(cav), datetime=datetime, deployment=deployment)
                 if val != mode:
                     raise ValueError("Cavity '" + cav + "' not in GDR mode.  Mode = " + str(val))
+
+    def validate_zones(self):
+        """This method ensures that the model does not make predictions on certain C100 zones, namely 0L04
+
+            Returns:
+                None
+
+            Raises:
+                ValueError: if the zone name is 0L04.
+        """
+        invalid_zones = ['0L04']
+        if self.zone_name in invalid_zones:
+            raise ValueError("Zone {} is not a valid zone for this model".format(self.zone_name))
