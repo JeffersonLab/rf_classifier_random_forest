@@ -470,7 +470,7 @@ def main():
             if error is None:
                 # Try to analyze the fault.  If any of the validation routines fail, they will raise an exception.
                 try:
-                    result = mod.analyze();
+                    result = mod.analyze()
                     data.append(result)
                 except:
                     ex = sys.exc_info()
