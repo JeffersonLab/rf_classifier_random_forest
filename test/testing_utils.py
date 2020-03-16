@@ -102,8 +102,8 @@ class TestSet:
         self.test_set_df = pd.read_csv(file_path, sep='\t', header=0, index_col=False)
 
         # Confidences in file are given as percentages
-        self.test_set_df.loc[:, "cav_conf"] = np.round(self.test_set_df.loc[:, "cav_conf"]/100, 2)
-        self.test_set_df.loc[:, "fault_conf"] = np.round(self.test_set_df.loc[:, "fault_conf"]/100, 2)
+        self.test_set_df.loc[:, "cav_conf"] = np.round(self.test_set_df.loc[:, "cav_conf"]/100, 4)
+        self.test_set_df.loc[:, "fault_conf"] = np.round(self.test_set_df.loc[:, "fault_conf"]/100, 4)
 
     def get_events(self):
         out = []
