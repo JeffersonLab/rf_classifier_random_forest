@@ -438,6 +438,7 @@ class Model(BaseModel):
         self.validate_capture_file_waveforms()
         self.validate_waveform_times()
         self.validate_cavity_modes(deployment=deployment)
+        self.validate_zones()
 
 
 def main():
