@@ -37,6 +37,12 @@ class Model(BaseModel):
     Additional documentation is available in the package docs folder.
     """
 
+    def __init__(self, path):
+        """Create a Model object  This only creates one additional member over BaseModel, the reduced_df DataFrame"""
+        self.reduced_df = None
+        super().__init__(path)
+
+
     def analyze(self, deployment='ops'):
         """A method for analyzing the data held in event_dir that returns cavity and fault type label information.
 
