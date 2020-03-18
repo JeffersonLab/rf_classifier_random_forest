@@ -1,3 +1,4 @@
+import datetime
 import unittest
 import warnings
 
@@ -47,7 +48,12 @@ class TestRandomForest(TestCase):
 
                 mod = Model(path)
                 try:
-                    result = mod.analyze(deployment='history')
+                    # The history archiver has everything, except recent data.  ops archiver has recent data, but not
+                    # anything more than maybe two years old.
+                    deployment = 'history'
+                    if datetime.datetime.now() - event.timestamp < datetime.timedelta(days=31):
+                        deployment = 'ops'
+                    result = mod.analyze(deployment=deployment)
                 except Exception as e:
                     failed += 1
                     print("Error analyzing data")
