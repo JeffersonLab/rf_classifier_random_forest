@@ -221,7 +221,7 @@ class BaseModel(ABC):
                     raise ValueError(
                         "Model could not identify require waveform matching pattern '" + pattern.pattern + "'")
 
-    def validate_waveform_times(self, max_start=-300.0, min_end=100.0, step_size=0.2, delta_max=0.01):
+    def validate_waveform_times(self, max_start=-300.0, min_end=100.0, step_size=0.2, delta_max=0.02):
         """Verify the Time column of all capture files are identical and have a valid range and sample interval.
 
             Args:
@@ -265,7 +265,7 @@ class BaseModel(ABC):
         lag = lag[1:len(lag)]
         max_step = max(lag)
         min_step = min(lag)
-        if abs(step_size - max_step) > delta_max or abs(step_size - min_step):
+        if abs(step_size - max_step) > delta_max or abs(step_size - min_step) > delta_max:
             raise ValueError("Found improper step size.  Expect: {}, Step size range: ({}, {}), Acceptable delta: {}"
                              .format(step_size, min_step, max_step, delta_max))
 
