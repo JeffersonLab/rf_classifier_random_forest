@@ -31,11 +31,13 @@ class EventData:
         """
         self.zone = zone
         # Supplied timestamps are in weird format, and don't have a decimal.  Add '.0' to keep consistent with real data
-        self.timestamp = timestamp.replace("/", "-").replace(":", "") + ".0"
+        self.timestamp_string = timestamp.replace("/", "-").replace(":", "") + ".0"
+        self.timestamp_fs_string = os.path.join(self.timestamp_string.split(" ")[0].replace("-", "_"),
+                                                self.timestamp_string.split(" ")[1].replace(":", ""))
         self.test_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "test-data", "tmp"))
         self.event_dir_base = os.path.join(self.test_dir, zone)
-        self.event_dir = os.path.join(self.event_dir_base, self.timestamp.split(" ")[0].replace("-", "_"),
-                                      self.timestamp.split(" ")[1].replace(":", ""))
+        self.event_dir = os.path.join(self.event_dir_base, self.timestamp_fs_string)
+        self.timestamp = datetime.datetime.strptime(self.timestamp_string, '%Y-%m-%d %H%M%S.%f')
 
     def get_event_data(self):
         """Downloads the data from accweb for the specified zone and timestamp."""
@@ -45,7 +47,7 @@ class EventData:
         z = urllib.parse.quote_plus(self.zone)
         in_fmt = '%Y-%m-%d %H%M%S.%f'
         out_fmt = '%Y-%m-%d %H:%M:%S'
-        begin = datetime.datetime.strptime(self.timestamp, in_fmt)
+        begin = self.timestamp
         end = begin + datetime.timedelta(seconds=1)
         b = urllib.parse.quote_plus(begin.strftime(out_fmt))
         e = urllib.parse.quote_plus(end.strftime(out_fmt))
@@ -69,8 +71,8 @@ class EventData:
             return
 
         # Write out the data into per-cavity capture files that the model expects to find
-        date = self.timestamp.split(" ")[0].replace("-", "_")
-        ctime = self.timestamp.split(" ")[1].replace(":", "")
+        date = self.timestamp_string.split(" ")[0].replace("-", "_")
+        ctime = self.timestamp_string.split(" ")[1].replace(":", "")
         base = df.columns.values[3][:3]
         for i in range(1, 9):
             cav = base + str(i)
@@ -114,10 +116,11 @@ class TestSet:
                 'expected': {
                     'location': self.test_set_df.loc[i, 'zone'],
                     'timestamp': self.test_set_df.loc[i, 'time'].replace("/", "-") + '.0',
-                    'cavity-label': str(self.test_set_df.loc[i, 'cav_pred']),
+                    'cavity-label': str(int(self.test_set_df.loc[i, 'cav_pred'])),
                     'cavity-confidence': self.test_set_df.loc[i, 'cav_conf'],
                     'fault-label': self.test_set_df.loc[i, 'fault_pred'],
-                    'fault-confidence': self.test_set_df.loc[i, 'fault_conf']
+                    'fault-confidence': self.test_set_df.loc[i, 'fault_conf'],
+                    'throws': self.test_set_df.loc[i, 'throws']
                 }
             })
         return out
