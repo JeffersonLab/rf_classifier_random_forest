@@ -34,7 +34,7 @@ zone	cavity	cav#	fault	time	cav_pred	cav_conf	fault_pred	fault_conf	throws
 1L24	6	38	Quench_100ms	2020/02/25 20:35:06	6	100.00	Quench_100ms	44.38	False
 1L24	6	38	Quench_100ms	2020/02/26 04:11:28	6	100.00	Quench_100ms	100.00	False
 1L24	6	38	Quench_3ms	2020/02/26 05:15:27	6	100.00	Quench_3ms	100.00	False
-1L26	0	49	Multi Cav turn off	2020/02/21 10:48:26	0	100.00	Multi Cav turn off	79.62	False
+1L26	0	49	Multi Cav turn off	2020/02/21 10:48:26	0	100.00	Multi Cav turn off	100.00	False
 1L25	8	48	E_Quench	2020/02/21 10:48:26	8	100.00	E_Quench	100.00	False
 1L24	2	34	Microphonics	2020/02/21 11:01:30	2	100.00	Microphonics	100.00	False
 2L26	2	90	Single Cav Turn off	2020/02/09 05:36:11	1	51.67	Single Cav Turn off	100.00	False
