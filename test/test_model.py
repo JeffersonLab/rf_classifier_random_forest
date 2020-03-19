@@ -10,7 +10,9 @@ import sys
 # run.
 import testing_utils
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__)), "lib")))
+app_root = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(__file__))))
+app_lib = os.path.join(app_root, "lib")
+sys.path.insert(0, app_lib)
 from model import Model
 
 
@@ -29,7 +31,11 @@ class TestRandomForest(TestCase):
             warnings.filterwarnings("ignore", "numpy.ufunc size changed, may indicate binary incompatibility. "
                                               "Expected 216, got 192")
             failed = 0
-            test_set = testing_utils.TestSet('test_set.txt')
+            test_file = os.path.join(app_root, 'test', 'test_set.txt')
+            test_set = testing_utils.TestSet(test_file)
+            num_tests = len(test_set.get_events())
+            print("Testing {} events.  This may take {}-{} seconds".format(num_tests, num_tests*5, num_tests*10))
+
             for test_event in test_set.get_events():
                 print("##### Testing: Event {} - {} #####".format(test_event['zone'], test_event['timestamp']))
                 event = testing_utils.EventData(zone=test_event['zone'], timestamp=test_event['timestamp'])
