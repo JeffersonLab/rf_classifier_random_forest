@@ -224,6 +224,9 @@ class BaseModel(ABC):
     def validate_waveform_times(self, max_start=-300.0, min_end=100.0, step_size=0.2, delta_max=0.02):
         """Verify the Time column of all capture files are identical and have a valid range and sample interval.
 
+        Note: The default 0.02 delta_max is chosen because the actual time step ranges from 0.18... to 0.21... when
+        a time step of 0.2 is specified.
+
             Args:
                 max_start (float): The latest acceptable start time for the waveforms
                 min_end (float): The earliest acceptable end time for the waveforms
@@ -356,7 +359,7 @@ class BaseModel(ABC):
                     raise ValueError("Cavity '" + cav + "' not in GDR mode.  Mode = " + str(val))
 
     def validate_zones(self):
-        """This method ensures that the model does not make predictions on certain C100 zones, namely 0L04
+        """This method ensures that the model does not make predictions on certain C100 zones, namely 0L04.
 
             Returns:
                 None
