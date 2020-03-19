@@ -1,6 +1,6 @@
 ---
 id: "random_forest_v1_2"
-releaseDate: "TBD"
+releaseDate: "March 30, 2020"
 cavityLabels:
   - 'multiple'
   - '1'
@@ -21,7 +21,7 @@ faultLabels:
   - 'Quench_3ms'
   - 'Single Cav Turn off'
 
-trainingData: "(Spring 2019) 2018_04_24 - 2018_05_06"
+trainingData: "Spring 2019 - Winter 2020 (March 9, 2020)"
 brief: "Uses random forests ensemble method for analysis"
 # This is YAML's block scaler with block-chomping set to keep final newlines, and an indent indicator (|+2) or
 # 2.  This means to keep the newline formatting, keep initial indents after the first two spaces, and keep
@@ -36,4 +36,6 @@ details: |+2
     generic label of 'multiple'.
 
     This version used a different training process that directly uses the statsmodel package to perform feature
-    extraction.  Additional documentation is available in the package docs folder.
+    extraction.  This dataset expands the set of identified fault types and considerably more data than previous models.
+    Note that 0L04 was excluded from training sets and this model will not make predictions on data labeled as being
+    from 0L04.  Additional documentation is available in the package docs folder.
