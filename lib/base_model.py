@@ -31,7 +31,7 @@ class BaseModel(ABC):
         """
         self.event_dir = event_dir
         self.event_df = None
-        self.zone_name = os.path.split(os.path.split(self.event_dir)[0])[-1]
+        self.zone_name = os.path.split(os.path.split(os.path.split(self.event_dir)[0])[0])[-1]
 
     @abstractmethod
     def analyze(self):
