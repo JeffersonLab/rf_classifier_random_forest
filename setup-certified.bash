@@ -53,6 +53,7 @@ compact () {
     echo "compacting - removing the venv directory along with any temporary files"
     if [ -d ./venv ] ; then
         rm -rf ./venv
+    fi
     rm -rf test/test-data/tmp
 }
 
