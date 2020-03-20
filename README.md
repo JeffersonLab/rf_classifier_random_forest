@@ -18,6 +18,9 @@ paths to their installation directory.
 
 **Note: The following steps after "Downloading Source (Optional)" must be performed for each installation directory.** 
 
+### rf_classifier Installation Instructions
+Please start the installation procedure with the instructions from here http://devweb/controls_web/certified/rf_classifier/admin_guide/certified_install.html#sqam-model-install-guide.  This describes the process for linking in the new model with the existing certified app, and defers to this README for specific build/install/test steps related to this specific module.
+
 ### Download Source (Optional)
 As the SQAM, the developer should have given you a code tarball to install.  If not, here is how you would download the
 latest source from github. 
