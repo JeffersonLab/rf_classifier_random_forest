@@ -4,3 +4,4 @@ __pycache__/
 # We are commiting the compressed versions of these, and unpacking on install.
 lib/model_files/RF_FAULT_20210715.pkl
 lib/model_files/RF_CAVITY_20210715.pkl
+test/test_results.txt
