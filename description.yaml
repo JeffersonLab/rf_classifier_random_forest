@@ -1,6 +1,6 @@
 ---
-id: "random_forest_v1_2"
-releaseDate: "March 20, 2020"
+id: "random_forest_v1_3"
+releaseDate: "Sep 23, 2021"
 cavityLabels:
   - 'multiple'
   - '1'
@@ -21,21 +21,24 @@ faultLabels:
   - 'Quench_3ms'
   - 'Single Cav Turn off'
 
-trainingData: "Spring 2019 - Winter 2020 (March 9, 2020)"
-brief: "Uses random forests ensemble method for analysis"
+trainingData: "Spring 2019 - Summer 2020 (September 20, 2020)"
+brief: "Uses random forests ensemble method for analysis of AR features of pre-fault data."
 # This is YAML's block scaler with block-chomping set to keep final newlines, and an indent indicator (|+2) or
 # 2.  This means to keep the newline formatting, keep initial indents after the first two spaces, and keep
-# the final newlines.  This string gets present exactly as is in model listings.
+# the final newlines.  This string gets presented exactly as is in model listings.
 details: |+2
 
-    This model uses random forest models to identify the faulted cavity and fault type of a C100 event.
+    This model uses random forest models to identify the faulted cavity and fault type of a C100 event and was only
+    trained on pre-fault data (t < 0) portions of the waveforms.  This uses eight autoregressive features per signal.
+    Signals analyzed are the GMES, GASK, DETA2, and CRFP waveforms for all eight cavities.
 
     This model is based on work done by Chris Tennant, Lasitha Vidyaratne, Tom Powers, etc. and represents a improved
-    model used to identify which cavity and fault type is associated with a C100 fault event.  Any individual cavity can
-    be identified as the offending cavity.  Any collection of multiple cavities faulting at the same time are given the
-    generic label of 'multiple'.
+    model used to identify which cavity and fault type is associated with a C100 fault event.  Since this model is
+    trained only on pre-fault portions of the signal, it should be resistant to changes in post-fault behavior (soft
+    fault, non-GDR modes, etc.).   Any individual cavity can be identified as the offending cavity.  Any collection of
+    multiple cavities faulting at the same time are given the generic label of 'multiple'.
 
-    This version used a different training process that directly uses the statsmodel package to perform feature
+    This version used a different training process that directly uses the statsmodel package to perform AR feature
     extraction.  This dataset expands the set of identified fault types and considerably more data than previous models.
     Note that 0L04 was excluded from training sets and this model will not make predictions on data labeled as being
     from 0L04.  Additional documentation is available in the package docs folder.

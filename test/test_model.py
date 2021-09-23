@@ -32,10 +32,12 @@ class TestRandomForest(TestCase):
                                               "Expected 216, got 192")
             failed = 0
             test_file = os.path.join(app_root, 'test', 'test_set.txt')
+            test_results_file = os.path.join(app_root, 'test', 'test_results.txt')
             test_set = testing_utils.TestSet(test_file)
             num_tests = len(test_set.get_events())
             print("Testing {} events.  This may take {}-{} seconds".format(num_tests, num_tests*5, num_tests*10))
 
+            ts_new_df = test_set.test_set_df.copy()
             for test_event in test_set.get_events():
                 print("##### Testing: Event {} - {} #####".format(test_event['zone'], test_event['timestamp']))
                 event = testing_utils.EventData(zone=test_event['zone'], timestamp=test_event['timestamp'])
@@ -67,6 +69,10 @@ class TestRandomForest(TestCase):
                     except:
                         pass
                     else:
+                        z_match = ts_new_df.zone == test_event['zone']
+                        t_match = ts_new_df.time == test_event['timestamp']
+                        ts_new_df.loc[z_match & t_match, 'throws'] = False
+
                         failed += 1
                         print("FAIL: Model should have thrown exception, but did not")
 
@@ -76,12 +82,24 @@ class TestRandomForest(TestCase):
                     except Exception as e:
                         failed += 1
                         print("Error analyzing data")
-                        print(e)
+                        print(repr(e))
+
+                        z_match = ts_new_df.zone == test_event['zone']
+                        t_match = ts_new_df.time == test_event['timestamp']
+                        ts_new_df.loc[z_match & t_match, 'throws'] = True
                         continue
 
                     # The test set file only has four decimal places.
                     result['cavity-confidence'] = round(result['cavity-confidence'], 4)
                     result['fault-confidence'] = round(result['fault-confidence'], 4)
+
+                    # Update the 'new' test set with these results
+                    z_match = ts_new_df.zone == test_event['zone']
+                    t_match = ts_new_df.time == test_event['timestamp']
+                    ts_new_df.loc[z_match & t_match, 'cav_pred'] = result['cavity-label']
+                    ts_new_df.loc[z_match & t_match, 'fault_pred'] = result['fault-label']
+                    ts_new_df.loc[z_match & t_match, 'cav_conf'] = round(result['cavity-confidence'] * 100, 2)
+                    ts_new_df.loc[z_match & t_match, 'fault_conf'] = round(result['fault-confidence'] * 100, 2)
 
                     # Remove the throws entry from expected since the result won't have this
                     del expect['throws']
@@ -96,6 +114,12 @@ class TestRandomForest(TestCase):
                 except Exception as e:
                     print("Error deleting data")
                     print(e)
+
+            # Convert back to the numeric version.
+            ts_new_df.loc[ts_new_df['cav_pred'] == 'multiple', 'cav_pred'] = '0'
+
+            # Write out the results of the test in a similar fashion as the test set
+            ts_new_df.to_csv(test_results_file, sep='\t', index=False)
 
             if failed > 0:
                 print("\n############### FAIL ###################")

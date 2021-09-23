@@ -3,8 +3,20 @@
 <head><title>Random Forest Release Notes</title></head>
 <body>
 <h1>rf_classifier Random Forest Model Release Notes</h1>
+<h2>September 23, 2021 v1.3</h2>
+<p>Deployed new "pre-fault" ML models that make use of eight AR parameters and were trained on additional fault data.
+    Converted this model to use the rfwtools package, which handles the data loading, validation, and feature extraction
+    in a well designed, well tested library.  Updates include:
+<ul>
+    <li>New AR8 ML models that analyze only pre-fault data.</li>
+    <li>Conversion to rfwtools package which handles all of the data management tasks</li>
+    <li>Improvements to the testing process that generates easily digestible reports</li>
+</ul>
+</p>
+
 <h2>March 20, 2020 v1.2</h2>
-<p>Main change was to implemented new models that exclusively use autoregression to reduce feature extraction time.  Other updates include:
+<p>Main change was to implemented new models that exclusively use autoregression to reduce feature extraction time.
+    Other updates include:
 <ul>
     <li>New models trained on considerably more data - ~2000 examples from Spring 2019 - Winter 2020</li>
     <li>0L04 excluded from training and prediction based on guidance from Tom Powers</li>
@@ -22,7 +34,8 @@
     <li>Updated requirements.txt file</li>
 </ul>
 </p>
-<p>Updated methods from analyze() on down to allow caller to specify which MYA deployment to use. Needed for testing.</p>
+<p>Updated methods from analyze() on down to allow caller to specify which MYA deployment to use. Needed for
+    testing.</p>
 <p>Updated certified install instructions (in README.MD) to properly handle virtual environment absolute path
     problems.</p>
 <p>Root directory includes updated requirements.txt and requirements-certified.txt files which only specify directly

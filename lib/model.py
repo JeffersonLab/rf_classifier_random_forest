@@ -1,17 +1,17 @@
 import os
 import sys
-import pandas as pd
-import numpy as np
+import traceback
 import math
-import sklearn
 import utils
 import json
-
-from statsmodels.tsa.ar_model import AR
-from sklearn import preprocessing
-from sklearn.externals import joblib
+import joblib
+from datetime import datetime
 
 from base_model import BaseModel
+from rfwtools.example import WindowedExample
+from rfwtools.example_validator import WindowedExampleValidator
+from rfwtools.extractor.autoregressive import autoregressive_extractor, get_signal_names
+from rfwtools.config import Config
 
 app_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 """The base directory of this model application."""
@@ -34,10 +34,25 @@ class Model(BaseModel):
     """
 
     def __init__(self, path):
-        """Create a Model object  This only creates one additional member over BaseModel, the reduced_df DataFrame"""
-        self.reduced_df = None
-        self.common_features_df = None
+        """Create a Model object.  This performs all data handling, validation, and analysis."""
+        # Make sure we do not have a trailing slash to muck up processing later.
+        path = path.rstrip(os.sep)
         super().__init__(path)
+
+        # Split up the path into it's constituent pieces
+        tokens = path.split(os.sep)
+        dt = datetime.strptime(f"{tokens[-2]} {tokens[-1]}", "%Y_%m_%d %H%M%S.%f")
+        zone = tokens[-3]
+
+        # Save the root data path into the rfwtools configuration
+        data_dir = os.sep + os.path.join(*tokens[:-3])
+        Config().data_dir = data_dir
+
+        self.example = WindowedExample(zone=zone, dt=dt, start=-1536.0, n_samples=7666, cavity_conf=math.nan,
+                                       fault_conf=math.nan, cavity_label="", fault_label="", label_source="")
+        self.example.load_data()
+        self.validator = WindowedExampleValidator()
+        self.common_features_df = None
 
     def analyze(self, deployment='ops'):
         """A method for analyzing the data held in event_dir that returns cavity and fault type label information.
@@ -47,155 +62,70 @@ class Model(BaseModel):
         "multiple" cavity label, the no fault type label determination is made.  Instead, a fault type label of
         "Multi Cav Turn Off" with the same confidence as the cavity label.
         """
-
         # Check that the data we're about to analyze meets any preconditions for our model
         self.validate_data(deployment)
 
-        # Load the data from disk and parse it into a convenient pandas dataframe.
-        self.parse_event_dir()
-
         # Fault and cavity models use same data and features.  Get that now.
-        self.get_reduced_data()
-        self.extract_features()
+        signals = get_signal_names(cavities=['1', '2', '3', '4', '5', '6', '7', '8'],
+                                   waveforms=['GMES', 'GASK', 'CRFP', 'DETA2'])
+        self.common_features_df = autoregressive_extractor(self.example, normalize=True, max_lag=7, signals=signals)
 
         # Analyze the data to determine which cavity caused the fault.
         cav_results = self.get_cavity_label()
 
         # A value of cavity-label '0' corresponds to a multi-cavity event.  In this case the fault analysis is
-        # unreliable and we should short circuit and report only a multi-cavity fault type (likely someone performing
-        # a zone wide operation triggering a "fault").  Use the cavity confidence since it is the prediction we're
-        # basing this on.
+        # unreliable and we should short circuit and report only a multi-cavity fault type (likely someone
+        # performing a zone wide operation triggering a "fault").  Use the cavity confidence since it is the
+        # prediction we're basing this on.
         fault_results = {'fault-label': 'Multi Cav turn off', 'fault-confidence': cav_results['cavity-confidence']}
         if cav_results['cavity-label'] != 'multiple':
             fault_results = self.get_fault_type_label(int(cav_results['cavity-label']))
 
-        # Get the name and timestamp of the event
-        (zone, timestamp) = utils.path_to_zone_and_timestamp(self.event_dir)
-
         return {
-            'location': zone,
-            'timestamp': timestamp,
+            'location': self.example.event_zone,
+            'timestamp': self.example.event_datetime.strftime("%Y-%m-%d %H:%M:%S.%f")[:-5],
             'cavity-label': cav_results['cavity-label'],
             'cavity-confidence': cav_results['cavity-confidence'],
             'fault-label': fault_results['fault-label'],
             'fault-confidence': fault_results['fault-confidence']
         }
 
-    def get_reduced_data(self):
-        # Need to reduce the number of waveforms in order to reduce the computational complexity of feature extraction.
-        # These were selected since this is what SRF experts use to "manually" determine which cavity and fault info.
-        waveforms = [
-            "1_GMES", "1_GASK", "1_CRFP", "1_DETA2",
-            "2_GMES", "2_GASK", "2_CRFP", "2_DETA2",
-            "3_GMES", "3_GASK", "3_CRFP", "3_DETA2",
-            "4_GMES", "4_GASK", "4_CRFP", "4_DETA2",
-            "5_GMES", "5_GASK", "5_CRFP", "5_DETA2",
-            "6_GMES", "6_GASK", "6_CRFP", "6_DETA2",
-            "7_GMES", "7_GASK", "7_CRFP", "7_DETA2",
-            "8_GMES", "8_GASK", "8_CRFP", "8_DETA2"
-        ]
+    def validate_data(self, deployment='ops'):
+        """Check that the event directory and it's data is of the expected format.
 
-        # Subset the event DataFrame to contain only the needed waveforms.
-        self.reduced_df = self.event_df.loc[:, waveforms]
+        This method inspects the event directory and raises an exception if a problem is found.  The following aspects
+        of the event directory and waveform data are validated.
+           # All eight cavities are represented by exactly one capture file
+           # All of the required waveforms are represented exactly once
+           # All of the capture files use the same timespan and have constant sampling intervals
+           # All of the cavity are in the appropriate control mode (GDR I/Q => 4 or SELAP => 64)
 
-        # This is probably an unnecessary check, but it's good to be safe.
-        if self.reduced_df.shape != (8192, len(waveforms)):
-            raise ValueError("Cavity label dataset has improper dimensions.  Expected (8192," +
-                             str(len(waveforms)) + ") received " + ascii(self.reduced_df.shape))
+        Args:
+            deployment (str):  Which MYA deployment to use when validating cavity operating modes.
 
-    def extract_features(self):
-        """Computes the extracted features, common_features_df, for both models based on the reduced DataFrame.
-
-            Returns None:  A DataFrame of cavity features, one per column.
+        Returns:
+            None: Subroutines raise an exception if an error condition is found.
         """
+        self.validator.set_example(self.example)
 
-        # The standard scaler has issues with constant waveforms and sometimes returns +/-1 instead of zero.
-        # This can cause exceptions in the follow on AR calls.
-        signals = self.set_constant_waveforms_to_zero(self.reduced_df)
+        # Don't just use the built in validate_data method as this needs to be future proofed against C100 firmware
+        # upgrades.  This upgrade will result in a new mode SELAP (R...CNTL2MODE == 64).
+        self.validator.validate_capture_file_counts()
+        self.validator.validate_capture_file_waveforms()
 
-        # Standardized the signals to z-scores
-        signal_scaler = preprocessing.StandardScaler(copy=True, with_mean=True, with_std=True)
-        signals = signal_scaler.fit_transform(signals)
-
-        # Make a call to run auto-regression method and save the extracted features
-        self.common_features_df = self.get_stat_AR_coefficients(signals, 5)
-
-    def get_fault_type_label(self, cavity_number):
-        """Determines the fault type based on a Model's reduced_df.  Examines the data for the specified cavity.
-
-            Args:
-                cavity_number (int): The number of the cavity (1-8) that caused the fault.
-
-            Returns:
-                dict:  A dictionary with format {'fault-label': <string_label>, 'fault-confidence': <float in [0,1]>}"
-        """
-        # Make sure we received a valid cavity number
-        self.assert_valid_cavity_number(cavity_number)
-
-        # Imputing on a single example is useless since there is no population to provide ranges or median values
-        # Load the fault type model and make a prediction about the type of fault
-        rf_fault_model = joblib.load(os.path.join(lib_dir, 'model_files', 'RF_FAULT_03112020.sav'))
-        fault_id = rf_fault_model.predict(self.common_features_df)
-
-        # predict_proba returns a mildly complicated np.array structure for our purposes different than documented.
-        # It contains an array of predicted probabilities for each category indexed on classes_.
-        # For some reason, accessing this value is returning as an array, so we need an extra [0] to get it as a number
-        # as in the return statement.
-        fault_confidence = rf_fault_model.predict_proba(self.common_features_df)[0][fault_id][0]
-
-        # The fault type labels are encoded as numbers.  Need to create a LabelEncoder, load the encodings from disk
-        # then "unencode" the fault_id to get the name of the fault type label.
-        le = sklearn.preprocessing.LabelEncoder()
-
-        # Default value of allow_pickle changed in newer versions.  Now =True is required here to allow loading of
-        # objects arrays.
-        le.classes_ = np.load(os.path.join(lib_dir, 'model_files', 'le_fault_classes.npy'), allow_pickle=True)
-        fault_name = le.inverse_transform(fault_id)
-
-        return {'fault-label': fault_name[0], 'fault-confidence': fault_confidence}
-
-    @staticmethod
-    def assert_valid_cavity_number(cavity_number):
-        """Throws an exception if the supplied integer is not a valid cavity number.
-
-            Raises:
-                TypeError: if cavity_number is not an int
-                ValueError: if cavity_number is not in range [1,8]
-        """
-
-        # Check that we have a valid cavity number
-        if not isinstance(cavity_number, int):
-            raise TypeError("cavity_number must be of type int")
-        if not (cavity_number <= 8 or cavity_number >= 1):
-            raise ValueError("cavity_number must be within span of [1,8]")
-
-    @staticmethod
-    def set_constant_waveforms_to_zero(df):
-        """Set constant waveforms to all zero value.
-
-        Expects a DataFrame with waveforms in columns.
-
-            Args:
-                df (DataFrame):  DataFrame of waveform values, one waveform per column
-
-            Returns (DataFrame): A new DataFrame where the constant waveforms have been set to zero
-        """
-        out = df.copy()
-        for column in out.columns:
-            if np.max(out[column]) == np.min(out[column]):
-                out[column].values[:] = 0
-
-        return out
+        # Many of these examples will have some amount of rounding error.
+        self.validator.validate_waveform_times(min_end=1532.9, max_start=0, step_size=0.2)
+        self.validator.validate_cavity_modes(mode=(4, 64), deployment=deployment)
+        self.validator.validate_zones()
 
     def get_cavity_label(self):
-        """Loads the underlying model and performs the predictions.
+        """Loads the underlying cavity model and performs the predictions based on the common_features_df.
 
-        This model operates on the common_features_df that is generated.
-
-            Returns dictionary:  A dictionary containing both the cavity-label and cavity-confidence.
+            Returns:
+                A dictionary with format {'cavity-label': <string_label>, 'cavity-confidence': <float in [0,1]>}"
         """
         # Load the cavity model
-        rf_cav_model = joblib.load(os.path.join(lib_dir, "model_files", 'RF_CAVITY_03112020.sav'))
+        rf_cav_model = joblib.load(os.path.join(lib_dir, "model_files", 'RF_CAVITY_20210715.pkl'))
 
         # Load the model from disk and make a prediction about which cavity faulted first.  The predict() method returns
         # an array of results.  We only have one result, so pull it out of the array structure now
@@ -217,84 +147,49 @@ class Model(BaseModel):
 
         return {'cavity-label': cavity_id, 'cavity-confidence': cavity_confidence}
 
-    # noinspection PyPep8Naming
-    def get_stat_AR_coefficients(self, signals, max_lag):
-        """Get the auto-regression coefficients for a set of time series signals.
+    def get_fault_type_label(self, cavity_number):
+        """Loads the underlying fault type model and performs the predictions based on the common_features_df.
 
             Args:
-                signals (DataFrame): A Pandas DataFrame of waveforms, one per column
-                max_lag (float): The maximum number of AR coefficients to return.  Will be zero padded if model requires
-                                  less than the number specified.
+                cavity_number (int): The number of the cavity (1-8) that caused the fault.
 
-            Returns DataFrame: A dataframe that contains a single row where each column is a parameter coefficient.
+            Returns:
+                A dictionary with format {'fault-label': <string_label>, 'fault-confidence': <float in [0,1]>}"
         """
-        for i in range(0, np.shape(signals)[1]):
+        # Make sure we received a valid cavity number
+        self.assert_valid_cavity_number(cavity_number)
 
-            # The AR model throws for some constant signals.  The signals should have been normalized into z-scores, in
-            # which case the parameters for an all zero signal are all zero.
-            if self.is_constant_signal(signals[i]) and signals[0, i] == 0:
-                parameters = np.append((np.zeros(max_lag + 1)))
-            else:
-                model = AR(signals[:, i])
-                model_fit = model.fit(maxlag=max_lag, ic=None)
-                if np.shape(model_fit.params)[0] < max_lag + 1:
-                    parameters = np.pad(model_fit.params, (0, max_lag + 1 - np.shape(model_fit.params)[0]), 'constant',
-                                        constant_values=0)
-                elif np.shape(model_fit.params)[0] > max_lag + 1:
-                    parameters = model_fit.params[: max_lag]
-                else:
-                    parameters = model_fit.params
+        # Imputing on a single example is useless since there is no population to provide ranges or median values
+        # Load the fault type model and make a prediction about the type of fault
+        rf_fault_model = joblib.load(os.path.join(lib_dir, 'model_files', 'RF_FAULT_20210715.pkl'))
+        fault_name = rf_fault_model.predict(self.common_features_df)[0]
 
-            if i == 0:
-                coefficients = parameters
-            else:
-                coefficients = np.append(coefficients, parameters, axis=0)
+        # The model returns the string name.  We need the index to get a probability
+        fault_id = rf_fault_model.classes_.tolist().index(fault_name)
 
-        return pd.DataFrame(coefficients).T
+        # predict_proba returns a mildly complicated np.array structure for our purposes different than documented.
+        # It contains an array of predicted probabilities for each category indexed input example, then on classes_.
+        fault_confidence = rf_fault_model.predict_proba(self.common_features_df)[0][fault_id]
 
-    def is_constant_signal(self, signal):
-        """Is the supplied signal array only contains a single value, excluding NaN.  However, all NaNs returns true"""
+        return {'fault-label': fault_name, 'fault-confidence': fault_confidence}
 
-        # Skip any NaNs
-        start = 0
-        length = len(signal)
-        while start < length and math.isnan(signal[start]):
-            start += 1
+    @staticmethod
+    def assert_valid_cavity_number(cavity_number):
+        """Throws an exception if the supplied integer is not a valid cavity number.
 
-        # Only NaNs so return True (constant in some fashion)
-        if start == length:
-            return True
+            Args:
+                cavity_number (int): The cavity number to evaluate.
 
-        # Work through the rest of the array, skipping NaNs
-        prev = signal[start]
-        for i in range(start + 1, len(signal)):
-            if math.isnan(signal[i]):
-                continue
-            if prev != signal[i]:
-                return False
-            prev = signal[i]
-
-        return True
-
-    def validate_data(self, deployment='ops'):
-        """Check that the event directory and it's data is of the expected format.
-
-        This method inspects the event directory and raises an exception if a problem is found.  The following aspects
-        of the event directory and waveform data are validated.
-           # All eight cavities are represented by exactly one capture file
-           # All of the required waveforms are represented exactly once
-           # All of the capture files use the same timespan and have constant sampling intervals
-           # All of the cavity are in the appropriate control mode (GDR I/Q => 4)
-
-        Returns:
-            None: Subroutines raise an exception if an error condition is found.
-
+            Raises:
+                TypeError: if cavity_number is not an int
+                ValueError: if cavity_number is not in range [1,8]
         """
-        self.validate_capture_file_counts()
-        self.validate_capture_file_waveforms()
-        self.validate_waveform_times()
-        self.validate_cavity_modes(deployment=deployment)
-        self.validate_zones()
+
+        # Check that we have a valid cavity number
+        if not isinstance(cavity_number, int):
+            raise TypeError("cavity_number must be of type int")
+        if not (cavity_number <= 8 or cavity_number >= 1):
+            raise ValueError("cavity_number must be within span of [1,8]")
 
 
 def main():
@@ -319,22 +214,22 @@ def main():
             error = None
             try:
                 (zone, timestamp) = utils.path_to_zone_and_timestamp(path)
-            except:
-                ex = sys.exc_info()
+            except Exception as ex:
+                # ex = sys.exc_info()
                 # ex[1] is the exception message
-                error = "{}".format(ex[1])
+                error = "{}".format(repr(ex))
 
             if error is None:
                 # Try to analyze the fault.  If any of the validation routines fail, they will raise an exception.
                 try:
                     result = mod.analyze()
                     data.append(result)
-                except:
-                    ex = sys.exc_info()
+                except Exception as ex:
+                    # ex = sys.exc_info()
 
                     result = {
                         # ex[1] is the exception message
-                        'error': r'{}'.format(ex[1]),
+                        'error': r'{}'.format(repr(ex)),
                         'location': zone,
                         'timestamp': timestamp
                     }

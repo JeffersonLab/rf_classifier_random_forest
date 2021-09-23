@@ -1,68 +1,67 @@
 zone	cavity	cav#	fault	time	cav_pred	cav_conf	fault_pred	fault_conf	throws
-1L23	4	28	Microphonics	2020/03/07 10:42:39	4	98.00	Microphonics	100.00	False
-1L25	5	45	Microphonics	2020/03/07 16:52:43	5	91.67	Microphonics	100.00	False
-1L23	1	25	Quench_3ms	2020/03/07 18:29:16	1	92.67	Quench_3ms	100.00	False
-1L25	5	45	Microphonics	2020/03/07 18:33:33	5	100.00	Microphonics	100.00	False
-1L23	1	25	Quench_3ms	2020/03/07 18:54:08	1	100.00	Quench_3ms	89.75	False
-1L24	1	33	Single Cav Turn off	2020/03/07 18:55:07	1	100.00	Multi Cav turn off	63.71	False
-1L26	0	49	Multi Cav turn off	2020/03/07 18:55:12	0	63.00	Multi Cav turn off	63.00	False
-1L23	1	25	Quench_3ms	2020/03/07 19:01:15	1	100.00	Quench_3ms	100.00	False
-1L23	1	25	Quench_3ms	2020/03/07 22:04:41	1	100.00	Quench_3ms	88.25	False
-1L25	5	45	Microphonics	2020/03/08 00:10:13	5	100.00	Microphonics	90.25	False
-1L25	7	47	Microphonics	2020/03/08 04:23:38	7	100.00	Microphonics	100.00	False
-2L26	8	96	E_Quench	2020/03/08 04:31:39	8	100.00	E_Quench	84.88	False
-2L26	8	96	E_Quench	2020/03/08 04:36:52	8	74.00	E_Quench	100.00	False
-1L24	6	38	Quench_100ms	2020/03/08 06:56:52	6	62.00	Quench_100ms	100.00	False
-2L22	3	59	Quench_3ms	2020/03/08 10:02:11	3	100.00	Microphonics	54.06	False
-1L23	4	28	Quench_3ms	2020/03/08 12:08:22	4	95.50	Quench_3ms	68.50	False
-1L25	1	41	E_Quench	2020/03/08 12:14:22	1	100.00	E_Quench	100.00	False
-1L26	8	56	E_Quench	2020/03/08 12:14:23	8	100.00	E_Quench	100.00	False
-1L23	4	28	Quench_3ms	2020/03/08 12:31:55	4	100.00	Quench_3ms	100.00	False
-1L23	4	28	Quench_3ms	2020/03/08 12:41:09	4	100.00	Quench_3ms	100.00	False
-1L25	4	44	Single Cav Turn off	2020/03/04 08:42:21	4	79.33	Single Cav Turn off	100.00	False
-1L25	4	44	Microphonics	2020/03/04 08:43:45	4	100.00	Microphonics	100.00	False
-2L22	4	60	Microphonics	2020/03/04 08:51:48	4	100.00	Microphonics	100.00	False
-1L25	5	45	Microphonics	2020/03/04 11:21:01	5	96.67	Microphonics	100.00	False
-2L24	1	73	Single Cav Turn off	2020/03/04 15:18:47	1	78.67	Single Cav Turn off	100.00	False
-1L24	1	33	E_Quench	2020/03/04 15:22:06	1	100.00	E_Quench	100.00	False
-2L24	1	73	Single Cav Turn off	2020/03/04 15:26:17	1	100.00	Single Cav Turn off	100.00	False
-2L24	1	73	Single Cav Turn off	2020/03/04 18:20:12	1	100.00	Single Cav Turn off	100.00	False
-1L25	5	45	Single Cav Turn off	2020/03/04 23:20:17	5	96.00	Microphonics	94.88	False
-2L24	1	73	Single Cav Turn off	2020/03/04 23:20:30	1	92.67	Single Cav Turn off	100.00	False
-1L24	7	39	Quench_100ms	2020/02/25 14:06:34	7	29.67	Quench_100ms	48.50	False
-1L25	4	44	Microphonics	2020/02/25 16:43:19	4	100.00	Microphonics	100.00	False
-1L24	6	38	Quench_100ms	2020/02/25 20:35:06	6	100.00	Quench_100ms	44.38	False
-1L24	6	38	Quench_100ms	2020/02/26 04:11:28	6	100.00	Quench_100ms	100.00	False
-1L24	6	38	Quench_3ms	2020/02/26 05:15:27	6	100.00	Quench_3ms	100.00	False
-1L26	0	49	Multi Cav turn off	2020/02/21 10:48:26	0	100.00	Multi Cav turn off	100.00	False
-1L25	8	48	E_Quench	2020/02/21 10:48:26	8	100.00	E_Quench	100.00	False
-1L24	2	34	Microphonics	2020/02/21 11:01:30	2	100.00	Microphonics	100.00	False
-2L26	2	90	Single Cav Turn off	2020/02/09 05:36:11	1	51.67	Single Cav Turn off	100.00	False
-2L26	8	96	E_Quench	2020/02/09 06:47:22	8	100.00	E_Quench	100.00	False
-2L26	3	91	Single Cav Turn off	2020/02/09 08:58:07	3	61.50	Single Cav Turn off	100.00	False
-1L22	4	20	Microphonics	2020/01/22 16:22:08	4	100.00	Microphonics	83.56	False
-1L23	1	25	Quench_3ms	2020/01/22 18:24:58	1	100.00	Quench_3ms	100.00	False
-1L24	4	36	Quench_100ms	2020/01/22 18:25:41	4	100.00	Microphonics	39.50	False
-1L23	4	28	Controls Fault	2020/01/22 19:46:11	4	100.00	Controls Fault	100.00	False
-1L23	1	25	Quench_3ms	2020/01/17 23:41:16	1	70.67	Quench_3ms	62.19	False
-1L23	1	25	Quench_3ms	2020/01/17 23:44:05	1	100.00	Quench_3ms	86.31	False
-1L24	7	39	Controls Fault	2020/01/18 00:47:14	7	100.00	Controls Fault	100.00	False
-1L24	2	34	Single Cav Turn off	2020/01/18 02:29:04	2	100.00	Single Cav Turn off	100.00	False
-1L22	5	21	Microphonics	2020/01/18 06:11:41	4	42.67	Microphonics	58.81	False
-1L25	5	45	Single Cav Turn off	2020/01/18 08:14:36	5	100.00	Microphonics	42.12	False
-2L25	0	81	Multi Cav turn off	2020/01/15 15:45:51	0	100.00	Multi Cav turn off	100.00	False
-2L24	3	75	Quench_3ms	2020/01/15 21:33:22	3	100.00	Quench_3ms	44.88	False
-1L23	4	28	Single Cav Turn off	2020/01/16 00:46:34	4	100.00	Single Cav Turn off	100.00	False
-1L26	8	56	E_Quench	2020/01/16 01:25:12	8	100.00	E_Quench	100.00	False
-1L22	5	21	Heat Riser Choke	2020/01/13 08:18:07	4	44.00	Heat Riser Choke	50.00	False
-1L24	7	39	Quench_100ms	2020/01/13 15:56:01	7	100.00	Quench_100ms	100.00	False
-2L25	4	84	Heat Riser Choke	2020/01/13 18:21:37	4	100.00	Heat Riser Choke	100.00	False
-1L25	3	43	Single Cav Turn off	2020/01/12 16:18:05	3	100.00	Single Cav Turn off	100.00	False
-1L25	5	45	Controls Fault	2020/01/12 16:25:03	5	100.00	Single Cav Turn off	53.31	False
-2L22	2	58	Controls Fault	2020/01/12 16:27:46	2	100.00	Controls Fault	100.00	False
-1L25	8	48	Controls Fault	2020/01/12 16:30:40	8	100.00	Single Cav Turn off	51.50	False
-1L23	0	25	Multi Cav turn off	2020/01/08 09:12:53	0	100.00	Multi Cav turn off	100.00	False
-1L24	1	33	Single Cav Turn off	2020/01/08 09:13:00	1	100.00	Single Cav Turn off	100.00	False
-1L25	5	45	Microphonics	2020/01/08 09:13:07	5	100.00	Microphonics	100.00	False
-0L04	1	1	Single Cav Turn off	2020/03/07 18:54:48	-1	0	None	0	True
-1L26	8	56	E_Quench	2019/11/14 20:05:31	-1	0	None	0	True
+1L23	4	28	Microphonics	2020/03/07 10:42:39	4	91.86	Microphonics	94.0	False
+1L25	5	45	Microphonics	2020/03/07 16:52:43	5	95.43	Microphonics	94.8	False
+1L23	1	25	Quench_3ms	2020/03/07 18:29:16	4	27.14	Quench_3ms	44.6	False
+1L25	5	45	Microphonics	2020/03/07 18:33:33	5	82.43	Microphonics	88.4	False
+1L23	1	25	Quench_3ms	2020/03/07 18:54:08	4	39.57	Quench_3ms	36.0	False
+1L24	1	33	Single Cav Turn off	2020/03/07 18:55:07	1	95.29	Single Cav Turn off	60.6	False
+1L26	0	49	Multi Cav turn off	2020/03/07 18:55:12	0	0.0001	Multi Cav turn off	0.0001	True
+1L23	1	25	Quench_3ms	2020/03/07 19:01:15	4	37.71	Single Cav Turn off	41.0	False
+1L23	1	25	Quench_3ms	2020/03/07 22:04:41	1	32.43	Quench_3ms	34.8	False
+1L25	5	45	Microphonics	2020/03/08 00:10:13	5	93.0	Microphonics	77.2	False
+1L25	7	47	Microphonics	2020/03/08 04:23:38	7	69.43	Microphonics	85.4	False
+2L26	8	96	E_Quench	2020/03/08 04:31:39	8	92.43	E_Quench	83.6	False
+2L26	8	96	E_Quench	2020/03/08 04:36:52	8	87.57	E_Quench	57.2	False
+1L24	6	38	Quench_100ms	2020/03/08 06:56:52	6	48.0	Quench_100ms	51.2	False
+2L22	3	59	Quench_3ms	2020/03/08 10:02:11	3	41.71	Quench_3ms	66.8	False
+1L23	4	28	Quench_3ms	2020/03/08 12:08:22	4	80.71	Quench_3ms	85.8	False
+1L25	1	41	E_Quench	2020/03/08 12:14:22	1	27.29	E_Quench	29.8	False
+1L26	8	56	E_Quench	2020/03/08 12:14:23	8	0.0001	E_Quench	0.0001	True
+1L23	4	28	Quench_3ms	2020/03/08 12:31:55	4	81.43	Quench_3ms	79.6	False
+1L23	4	28	Quench_3ms	2020/03/08 12:41:09	4	84.0	Quench_3ms	64.2	False
+1L25	4	44	Single Cav Turn off	2020/03/04 08:42:21	4	92.29	Single Cav Turn off	94.0	False
+1L25	4	44	Microphonics	2020/03/04 08:43:45	4	92.0	Microphonics	94.6	False
+2L22	4	60	Microphonics	2020/03/04 08:51:48	4	82.0	Microphonics	66.4	False
+1L25	5	45	Microphonics	2020/03/04 11:21:01	5	50.14	Microphonics	65.2	False
+2L24	1	73	Single Cav Turn off	2020/03/04 15:18:47	1	82.86	Single Cav Turn off	99.6	False
+1L24	1	33	E_Quench	2020/03/04 15:22:06	1	60.0	E_Quench	81.0	False
+2L24	1	73	Single Cav Turn off	2020/03/04 15:26:17	1	99.43	Single Cav Turn off	98.6	False
+2L24	1	73	Single Cav Turn off	2020/03/04 18:20:12	1	98.43	Single Cav Turn off	72.0	False
+1L25	5	45	Single Cav Turn off	2020/03/04 23:20:17	5	98.57	Microphonics	63.4	False
+2L24	1	73	Single Cav Turn off	2020/03/04 23:20:30	1	98.57	Single Cav Turn off	98.8	False
+1L24	7	39	Quench_100ms	2020/02/25 14:06:34	7	71.29	Quench_100ms	85.0	False
+1L25	4	44	Microphonics	2020/02/25 16:43:19	4	94.57	Microphonics	96.6	False
+1L24	6	38	Quench_100ms	2020/02/25 20:35:06	6	95.14	Quench_100ms	93.4	False
+1L24	6	38	Quench_100ms	2020/02/26 04:11:28	6	34.43	Quench_100ms	50.4	False
+1L24	6	38	Quench_3ms	2020/02/26 05:15:27	6	33.57	Quench_100ms	37.6	False
+1L26	0	49	Multi Cav turn off	2020/02/21 10:48:26	0	0.0001	Multi Cav turn off	0.0001	True
+1L25	8	48	E_Quench	2020/02/21 10:48:26	8	90.0	E_Quench	88.2	False
+1L24	2	34	Microphonics	2020/02/21 11:01:30	2	81.86	Microphonics	93.0	False
+2L26	2	90	Single Cav Turn off	2020/02/09 05:36:11	3	31.71	Single Cav Turn off	91.6	False
+2L26	8	96	E_Quench	2020/02/09 06:47:22	8	18.57	E_Quench	94.8	False
+2L26	3	91	Single Cav Turn off	2020/02/09 08:58:07	3	96.71	Single Cav Turn off	97.8	False
+1L22	4	20	Microphonics	2020/01/22 16:22:08	4	77.43	Microphonics	64.4	False
+1L23	1	25	Quench_3ms	2020/01/22 18:24:58	1	99.71	Quench_3ms	100.0	False
+1L24	4	36	Quench_100ms	2020/01/22 18:25:41	4	78.86	Quench_100ms	73.0	False
+1L23	4	28	Controls Fault	2020/01/22 19:46:11	4	96.71	Controls Fault	92.0	False
+1L23	1	25	Quench_3ms	2020/01/17 23:41:16	1	97.43	Quench_3ms	96.6	False
+1L23	1	25	Quench_3ms	2020/01/17 23:44:05	1	99.57	Quench_3ms	99.0	False
+1L24	7	39	Controls Fault	2020/01/18 00:47:14	7	62.43	Controls Fault	71.4	False
+1L24	2	34	Single Cav Turn off	2020/01/18 02:29:04	2	97.43	Single Cav Turn off	99.8	False
+1L22	5	21	Microphonics	2020/01/18 06:11:41	5	67.71	Microphonics	72.0	False
+1L25	5	45	Single Cav Turn off	2020/01/18 08:14:36	5	97.29	Microphonics	38.2	False
+2L25	0	81	Multi Cav turn off	2020/01/15 15:45:51	8	34.43	Multi Cav turn off	96.8	False
+2L24	3	75	Quench_3ms	2020/01/15 21:33:22	3	49.43	Single Cav Turn off	41.4	False
+1L23	4	28	Single Cav Turn off	2020/01/16 00:46:34	4	95.57	Single Cav Turn off	99.4	False
+1L26	8	56	E_Quench	2020/01/16 01:25:12	8	0.0001	E_Quench	0.0001	True
+1L22	5	21	Heat Riser Choke	2020/01/13 08:18:07	4	56.29	Microphonics	25.2	False
+1L24	7	39	Quench_100ms	2020/01/13 15:56:01	7	78.0	Quench_100ms	91.8	False
+2L25	4	84	Heat Riser Choke	2020/01/13 18:21:37	4	84.43	Heat Riser Choke	72.2	False
+1L25	3	43	Single Cav Turn off	2020/01/12 16:18:05	3	89.86	Single Cav Turn off	96.8	False
+1L25	5	45	Controls Fault	2020/01/12 16:25:03	5	57.57	Controls Fault	97.2	False
+2L22	2	58	Controls Fault	2020/01/12 16:27:46	2	91.43	Controls Fault	93.4	False
+1L25	8	48	Controls Fault	2020/01/12 16:30:40	8	95.0	Controls Fault	99.0	False
+1L23	0	25	Multi Cav turn off	2020/01/08 09:12:53	0	94.14	Multi Cav turn off	94.14	False
+1L24	1	33	Single Cav Turn off	2020/01/08 09:13:00	1	94.14	Single Cav Turn off	89.8	False
+1L25	5	45	Microphonics	2020/01/08 09:13:07	5	45.57	Microphonics	97.0	False
+0L04	1	1	Single Cav Turn off	2020/03/07 18:54:48	-1	0.0	None	0.0	True

@@ -27,11 +27,14 @@ Usage:
 build () {
     echo "building - creating venv and installing packages"
     if [ ! -d ./venv ] ; then
-        /usr/csite/pubtools/python/3.6/bin/python3 -m venv ./venv
+        /usr/csite/pubtools/python/3.7/bin/python3 -m venv ./venv
     fi
     source ./venv/bin/activate
+    pip3 install -qq --upgrade pip
     pip3 install -qq -r requirements.txt
     deactivate
+    unzip -oq -d lib/model_files/ lib/model_files/RF_CAVITY*.zip
+    unzip -oq -d lib/model_files/ lib/model_files/RF_FAULT*.zip
 }
 
 test () {
@@ -50,11 +53,12 @@ install () {
 }
 
 compact () {
-    echo "compacting - removing the venv directory along with any temporary files"
+    echo "compacting - removing the venv directory, uncompressed models, and temporary files"
     if [ -d ./venv ] ; then
         rm -rf ./venv
     fi
     rm -rf test/test-data/tmp
+    rm lib/model_file/RF*.pkl
 }
 
 
